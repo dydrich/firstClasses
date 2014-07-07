@@ -1,26 +1,16 @@
 <?php
 
-include "../../../lib/start.php";
-
-ini_set("display_errors", "1");
+include "../../lib/start.php";
 
 check_session();
-check_permission(DIR_PERM|DSG_PERM);
+check_permission(DIR_PERM);
 
-$perms = ($_SESSION['__user__']->getPerms()) ? $_SESSION['__user__']->getPerms() : $_SESSION['__perms__'];
-//$nome = ($_SESSION['__user__']) ? $_SESSION['__user__']->getFullName() : $_SESSION['__fname__']." ".$_SESSION['__lname__'];
-
-if(DIR_PERM&$perms)
-		$_SESSION['__role__'] = "Dirigente scolastico";
-	else
-		$_SESSION['__role__'] = "DSGA";
-	
 $query_params = "";
 $order = "cognome, nome";
 if(isset($_REQUEST['order'])){
 	switch ($_REQUEST['order']){
 		case "from":
-			$order = "fc_alunni.classe_provenienza, cognome, nome";
+			$order = "rb_fc_alunni.classe_provenienza, cognome, nome";
 			break;
 		case "rip":
 			$order = "ripetente DESC, cognome, nome";
@@ -45,10 +35,10 @@ if(isset($_REQUEST['order'])){
 if(isset($_REQUEST['q'])){
 	switch($_REQUEST['q']){
 		case "assigned":
-			$query_params = "AND fc_alunni.id_classe IS NOT NULL";
+			$query_params = "AND rb_fc_alunni.id_classe IS NOT NULL";
 			break;
 		case "not_assigned":
-			$query_params = "AND fc_alunni.id_classe IS NULL";
+			$query_params = "AND rb_fc_alunni.id_classe IS NULL";
 			break;
 		default:
 			$query_params = "";
@@ -56,7 +46,7 @@ if(isset($_REQUEST['q'])){
 	}
 }
 	
-$sel_students = "SELECT id_alunno, CONCAT_WS(' ', cognome, nome) AS name, ripetente, H, sesso, voto, CONCAT_WS('. ', diagnosi_h, note) AS note, fc_scuole_provenienza.id_scuola AS school, fc_alunni.id_classe, classe_provenienza, CONCAT_WS(', ', fc_scuole_provenienza.codice, fc_classi_provenienza.descrizione) AS class_from FROM fc_alunni, fc_classi_provenienza, fc_scuole_provenienza WHERE fc_alunni.classe_provenienza = fc_classi_provenienza.id_classe AND fc_classi_provenienza.id_scuola = fc_scuole_provenienza.id_scuola $query_params ORDER BY $order";
+$sel_students = "SELECT id_alunno, CONCAT_WS(' ', cognome, nome) AS name, ripetente, H, sesso, voto, CONCAT_WS('. ', diagnosi_h, note) AS note, rb_fc_scuole_provenienza.id_scuola AS school, rb_fc_alunni.id_classe, classe_provenienza, CONCAT_WS(', ', rb_fc_scuole_provenienza.codice, rb_fc_classi_provenienza.descrizione) AS class_from FROM rb_fc_alunni, rb_fc_classi_provenienza, rb_fc_scuole_provenienza WHERE rb_fc_alunni.classe_provenienza = rb_fc_classi_provenienza.id_classe AND rb_fc_classi_provenienza.id_scuola = rb_fc_scuole_provenienza.id_scuola $query_params ORDER BY $order";
 try{
 	$res_students = $db->executeQuery($sel_students);
 } catch(MySQLException $ex){
@@ -67,7 +57,7 @@ $n_std = $res_students->num_rows;
 /*
  * let's match colors and classes
  */
-$sel_cls = "SELECT * FROM fc_classi ORDER BY descrizione";
+$sel_cls = "SELECT * FROM rb_fc_classi ORDER BY descrizione";
 $res_cls = $db->executeQuery($sel_cls);
 $classes_and_colors = array();
 $x = 1;
@@ -86,9 +76,7 @@ while($class_from = $res_classes_from->fetch_assoc()){
 }
 */
 
-$sel_cls = "SELECT * FROM fc_classi ORDER BY descrizione";
+$sel_cls = "SELECT * FROM rb_fc_classi ORDER BY descrizione";
 $res_cls = $db->executeQuery($sel_cls);
 
 include "students.html.php";
-
-?>

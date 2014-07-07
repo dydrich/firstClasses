@@ -1,11 +1,12 @@
-			<!-- SIDEBAR -->	
-			<h4>Nuove classi</h4>
-			<ul class="blocklist">
-				<li><a href="schools.php">Scuole di provenienza</a></li>
-				<li><a href="#">Alunni</a></li>
-					<li style="padding-left: 10px"><a href="insert_students.php">Inserimento</a></li>
-					<li style="padding-left: 10px"><a href="students.php">Gestione</a></li>
-				<li><a href="classes.php">Classi</a></li>
-				<li style="padding-top: 15px"><a href="nuove_classi.php">Altre classi</a></li>
-			</ul>
-			<!-- SIDEBAR -->
+			<div class="smallbox" id="working">
+				<h2 class="menu_head">Menu</h2>
+				<p class="menu_label act_icon">Nuove classi</p>
+				<ul class="menublock" style="" dir="rtl">
+					<li><a href="index.php">Home</a></li>
+					<li><a href="schools.php">Scuole di provenienza</a></li>
+					<li><a href="insert_students.php">Inserimento</a></li>
+					<li><a href="students.php">Gestione</a></li>
+					<li><a href="classi.php">Classi</a></li>
+					<li><a href="nuove_classi.php">Altre classi</a></li>
+				</ul>
+			</div>

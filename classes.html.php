@@ -1,70 +1,71 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>Area dirigenza::gestione nuove classi</title>
-<link rel="stylesheet" href="../styles.css" type="text/css" />
-<script type="text/javascript" src="/js/page.js"></script>
-<?php include $_ENV["DOCUMENT_ROOT"]."/js/prototype.php" ?>
-<script type="text/javascript">
-var _classes = function(){
-	var _cls = prompt("Inserisci le sezioni che vuoi creare, separate da una virgola");
-	if(trim(_cls) == ""){
-		alert("Non hai inserito nessuna sezione");
-		return false;
-	}
-	document.forms[0].cls.value = _cls;
-	document.forms[0].submit();
-};
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<title><?php print $_SESSION['__config__']['intestazione_scuola'] ?>:: classi prime scuola secondaria</title>
+	<link rel="stylesheet" href="../../css/reg.css" type="text/css" media="screen,projection" />
+	<link rel="stylesheet" href="../../css/general.css" type="text/css" media="screen,projection" />
+	<link rel="stylesheet" href="theme/style.css" type="text/css" media="screen,projection" />
+	<link rel="stylesheet" href="../../js/jquery_themes/custom-theme/jquery-ui-1.10.3.custom.min.css" type="text/css" media="screen,projection" />
+	<script type="text/javascript" src="../../js/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../js/jquery-ui-1.10.3.custom.min.js"></script>
+	<script type="text/javascript" src="../../js/jquery-ui-timepicker-addon.js"></script>
+	<script type="text/javascript">
+	var _classes = function(){
+		var _cls = prompt("Inserisci le sezioni che vuoi creare, separate da una virgola");
+		if(trim(_cls) == ""){
+			alert("Non hai inserito nessuna sezione");
+			return false;
+		}
+		document.forms[0].cls.value = _cls;
+		document.forms[0].submit();
+	};
 
-var del_cls = function(id){
-	if(!confirm("Sei sicuro di voler cancellare questa classe?"))
-		return false;
-	
-	var req = new Ajax.Request('del_cls.php',
-			  {
-			    	method:'post',
-			    	parameters: {id: id},
-			    	onSuccess: function(transport){
-			      		var response = transport.responseText || "no response text";
-			      		//alert(response);
-			      		var dati = response.split(";");
-		            	if(dati[0] == "ko"){
-							alert("Errore nella cancellazione della classe: "+dati[1]);
-							return false;
-		            	}
-		            	$('tr'+dati[1]).style.display = "none";
-			    	},
-			    	onFailure: function(){ alert("Si e' verificato un errore..."); }
-			  });
-		
-};
-</script>
-<style>
-tbody tr:hover { background-color: #D5C5AC }
-</style>
+	var del_cls = function(id){
+		if(!confirm("Sei sicuro di voler cancellare questa classe?"))
+			return false;
+
+		var req = new Ajax.Request('del_cls.php',
+				  {
+				        method:'post',
+				        parameters: {id: id},
+				        onSuccess: function(transport){
+				            var response = transport.responseText || "no response text";
+				            //alert(response);
+				            var dati = response.split(";");
+			                if(dati[0] == "ko"){
+								alert("Errore nella cancellazione della classe: "+dati[1]);
+								return false;
+			                }
+			                $('tr'+dati[1]).style.display = "none";
+				        },
+				        onFailure: function(){ alert("Si e' verificato un errore..."); }
+				  });
+
+	};
+	</script>
 </head>
 <body>
-<div class="pagewidth">
-	<div class="header">
-		<!-- TITLE -->
-		<h1><a href="htp://www.scuolamediatre.it">Scuola Media Statale Iglesias</a></h1>
-		<h2>Area riservata::dirigenza</h2>
-		<!-- END TITLE -->
+<?php include "../../intranet/{$_SESSION['__mod_area__']}/header.php" ?>
+<?php include "navigation.php" ?>
+<div id="main">
+	<div id="right_col">
+		<?php include "menu.php" ?>
 	</div>
-	<?php include "navbar.php" ?>
-	<div class="page-wrap">
-		<div class="content">	
-			<!-- CONTENT -->
-            <h3>Classi prime<span style="border-bottom: 1px solid; float: right; font-weight: bold; font-size: 13px; margin-right: 5%">Media generale: <?php print $mv ?></span></h3>
-            <form action="classes.php?update=1" method="post">
+	<div id="left_col">
+		<div style="width: 95%; height: 30px; margin: 10px auto 0 auto; text-align: center; font-size: 1.1em; text-transform: uppercase">
+			Alunni classi prime
+		</div>
+		<div id="not1" class="notification"></div>
+		<form id="my_form" style="border: 1px solid #666666; border-radius: 10px; margin-top: 20px; text-align: left; width: 80%; margin-left: auto; margin-right: auto" method="post">
 	 	    <?php if($n_cls < 1){ ?>
-	 	    <p style="margin-top: 20px; margin-bottom: 50px; font-weight: bold">Non hai ancora inserito nessuna classe.</p>
-	 	    <div style="width: 90%; text-align: right"><input style="padding: 5px" name="add_cls" id="_classes()" type="button" value="Inserisci classi" onclick="_classes()" class="button" />
-			<input type="hidden" name="cls" id="cls" /> 	    
+	 	    <p style="margin-top: 20px; margin-bottom: 50px" class="_bold _center">Non hai ancora inserito nessuna classe.</p>
+	 	    <div style="width: 90%; text-align: right">
+		        <a href="#" onclick="_classes()" class="standard_link">Inserisci classi</a>
+		        <input type="hidden" name="cls" id="cls" />
 	 	    </div>
-	 	    <?php } 
-			else{	 	    
+	 	    <?php
+	        } else{
 	 	    ?>	
 	 	    <table style="border-collapse: collapse; width: 95%; margin-top: 30px">
 	 	    	<thead>
@@ -132,12 +133,8 @@ tbody tr:hover { background-color: #D5C5AC }
 			<!-- END CONTENT -->
 			</form>	
 		</div>
-		<div class="sidebar">	
-			<?php include 'menu.php'; ?>
-		</div>
-		<div class="clear"></div>		
-	</div>
-    <?php include "../footer.php" ?>	
+	<p class="spacer"></p>
 </div>
+<?php include "../../intranet/{$_SESSION['__mod_area__']}/footer.php" ?>
 </body>
 </html>

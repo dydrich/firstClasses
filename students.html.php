@@ -1,115 +1,112 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>Area dirigenza::gestione nuove classi</title>
-<link rel="stylesheet" href="../styles.css" type="text/css" />
-<link href="/css/themes/default.css" rel="stylesheet" type="text/css"/>
-<link href="/css/themes/mac_os_x.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="/js/page.js"></script>
-<?php include $_ENV["DOCUMENT_ROOT"]."/js/prototype.php" ?>
-<script type="text/javascript" src="/js/window.js"></script>
-<script type="text/javascript" src="/js/window_effects.js"></script>
-<script type="text/javascript">
-var colors_and_classes = new Array();
-var delete_on_assign = <?php if($_REQUEST['q'] == "not_assigned") print("true"); else print("false") ?>;
-<?php
-foreach($classes_and_colors as $a){
-?>
-colors_and_classes[<?php print $a['id'] ?>] = {id: "<?php print $a['id'] ?>", cls: "<?php print $a['name'] ?>", color: "<?php print $a['color'] ?>" };
-<?php } ?>
-var win;
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<title><?php print $_SESSION['__config__']['intestazione_scuola'] ?>:: classi prime scuola secondaria</title>
+	<link rel="stylesheet" href="../../css/reg.css" type="text/css" media="screen,projection" />
+	<link rel="stylesheet" href="../../css/general.css" type="text/css" media="screen,projection" />
+	<link rel="stylesheet" href="theme/style.css" type="text/css" media="screen,projection" />
+	<link rel="stylesheet" href="../../js/jquery_themes/custom-theme/jquery-ui-1.10.3.custom.min.css" type="text/css" media="screen,projection" />
+	<script type="text/javascript" src="../../js/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../js/jquery-ui-1.10.3.custom.min.js"></script>
+	<script type="text/javascript" src="../../js/jquery-ui-timepicker-addon.js"></script>
+	<script type="text/javascript" src="../../js/page.js"></script>
+	<script type="text/javascript">
+	var colors_and_classes = new Array();
+	var delete_on_assign = <?php if($_REQUEST['q'] == "not_assigned") print("true"); else print("false") ?>;
+	<?php
+	foreach($classes_and_colors as $a){
+	?>
+	colors_and_classes[<?php print $a['id'] ?>] = {id: "<?php print $a['id'] ?>", cls: "<?php print $a['name'] ?>", color: "<?php print $a['color'] ?>" };
+	<?php } ?>
+	var win;
 
-var update_class = function(id, sel){
-	cl = sel.value;
-	var req = new Ajax.Request('upd_class.php',
-			  {
-			    	method:'post',
-			    	parameters: {std: id, cl: cl},
-			    	onSuccess: function(transport){
-			      		var response = transport.responseText || "no response text";
-			      		//alert(response);
-			      		var dati = response.split("|");
-		            	if(dati[0] == "ko"){
-							alert("Errore nell'aggiornamento della classe: "+dati[1]);
-							return false;
-		            	}
-		            	if(cl == "0"){
-							$('tr'+dati[1]).style.backgroundColor = "";
-							return false;
-						}
-						
-						obj = colors_and_classes[cl];
-						color = obj.color;
-						if(delete_on_assign)
-							$('tr'+dati[1]).style.display = "none";
-						else
-							$('tr'+dati[1]).style.backgroundColor = "#"+color;
-			    	},
-			    	onFailure: function(){ alert("Si e' verificato un errore..."); }
-			  });	
-};
+	var update_class = function(id, sel){
+		cl = sel.value;
+		var req = new Ajax.Request('upd_class.php',
+				  {
+				        method:'post',
+				        parameters: {std: id, cl: cl},
+				        onSuccess: function(transport){
+				            var response = transport.responseText || "no response text";
+				            //alert(response);
+				            var dati = response.split("|");
+			                if(dati[0] == "ko"){
+								alert("Errore nell'aggiornamento della classe: "+dati[1]);
+								return false;
+			                }
+			                if(cl == "0"){
+								$('tr'+dati[1]).style.backgroundColor = "";
+								return false;
+							}
 
-var _student = function(id){
-	url = "student.php?stid="+id+"&order=<?php print $_REQUEST['order'] ?>&q=<?php print $_REQUEST['q'] ?>";
-	if(id == 0){
-		// new student
-		if(confirm("L'alunno e' un ripetente?"))
-			url = "student.php?stid=0&rip=1";
-		else
-			url = "student.php?stid=0";
-	}
-	else{
-		// update student
-		
-	}
-	
-	win = new Window({className: "mac_os_x", url: url, top:100, left:100,  width:400, height:400, zIndex: 100, resizable: true, title: "Dettaglio alunno", showEffect:Effect.Appear, hideEffect: Effect.Fade, draggable:true, wiredDrag: true});
-	win.showCenter(false);
-};
+							obj = colors_and_classes[cl];
+							color = obj.color;
+							if(delete_on_assign)
+								$('tr'+dati[1]).style.display = "none";
+							else
+								$('tr'+dati[1]).style.backgroundColor = "#"+color;
+				        },
+				        onFailure: function(){ alert("Si e' verificato un errore..."); }
+				  });
+	};
 
-var del_std = function(stid){
-	var req = new Ajax.Request('manage_student.php',
-			  {
-			    	method:'post',
-			    	parameters: {stid: stid, action: 3},
-			    	onSuccess: function(transport){
-			      		var response = transport.responseText || "no response text";
-			      		//alert(response);
-			      		var dati = response.split("|");
-		            	if(dati[0] == "ko"){
-							alert("Errore nell'aggiornamento della classe: "+dati[1]);
-							return false;
-		            	}
-		            	$('tr'+stid).style.display = "none";
-			    	},
-			    	onFailure: function(){ alert("Si e' verificato un errore..."); }
-			  });	
-};
+	var _student = function(id){
+		url = "student.php?stid="+id+"&order=<?php print $_REQUEST['order'] ?>&q=<?php print $_REQUEST['q'] ?>";
+		if(id == 0){
+			// new student
+			if(confirm("L'alunno e' un ripetente?"))
+				url = "student.php?stid=0&rip=1";
+			else
+				url = "student.php?stid=0";
+		}
+		else{
+			// update student
 
-</script>
-<style>
+		}
 
-td {border: 0}
-</style>
+		win = new Window({className: "mac_os_x", url: url, top:100, left:100,  width:400, height:400, zIndex: 100, resizable: true, title: "Dettaglio alunno", showEffect:Effect.Appear, hideEffect: Effect.Fade, draggable:true, wiredDrag: true});
+		win.showCenter(false);
+	};
+
+	var del_std = function(stid){
+		var req = new Ajax.Request('manage_student.php',
+				  {
+				        method:'post',
+				        parameters: {stid: stid, action: 3},
+				        onSuccess: function(transport){
+				            var response = transport.responseText || "no response text";
+				            //alert(response);
+				            var dati = response.split("|");
+			                if(dati[0] == "ko"){
+								alert("Errore nell'aggiornamento della classe: "+dati[1]);
+								return false;
+			                }
+			                $('tr'+stid).style.display = "none";
+				        },
+				        onFailure: function(){ alert("Si e' verificato un errore..."); }
+				  });
+	};
+
+	</script>
 </head>
 <body>
-<div class="pagewidth">
-	<div class="header">
-		<!-- TITLE -->
-		<h1><a href="htp://www.scuolamediatre.it">Scuola Media Statale Iglesias</a></h1>
-		<h2>Area riservata::dirigenza</h2>
-		<!-- END TITLE -->
+<?php include "../../intranet/{$_SESSION['__mod_area__']}/header.php" ?>
+<?php include "navigation.php" ?>
+<div id="main">
+	<div id="right_col">
+		<?php include "menu.php" ?>
 	</div>
-	<?php include "navbar.php" ?>
-	<div class="page-wrap">
-		<div class="content">	
-			<!-- CONTENT -->
-            <h3>Alunni classi prime</h3>
-            <form action="students.php?update=1" method="post">
+	<div id="left_col">
+		<div style="width: 95%; height: 30px; margin: 10px auto 0 auto; text-align: center; font-size: 1.1em; text-transform: uppercase">
+			Alunni classi prime
+		</div>
+		<div id="not1" class="notification"></div>
+		<form id="my_form" style="border: 1px solid #666666; border-radius: 10px; margin-top: 20px; text-align: left; width: 80%; margin-left: auto; margin-right: auto" method="post">
 	 	    <?php if($n_std < 1){ ?>
-	 	    <p style="margin-top: 20px; margin-bottom: 50px; font-weight: bold">Non hai ancora inserito nessun alunno.</p>
-	 	    <div style="width: 90%; text-align: right"><input style="padding: 5px" name="add_std" id="add_std" type="button" value="Inserisci alunno" onclick="_student(0)" class="button" />
+	 	    <p style="margin-top: 20px; margin-bottom: 50px" class="_center _bold">Non hai ancora inserito nessun alunno.</p>
+	 	    <div style="width: 90%; text-align: right">
+		        <a href="#" onclick="_student(0)" class="standard_link">Inserisci alunno</a>
 			</div>
 	 	    <?php } 
 			else{	 	    
@@ -175,25 +172,15 @@ td {border: 0}
 	 	    	<?php } ?>
 	 	    	</tbody>
 	 	    	<tfoot>
-	 	   		<tr>
-	 				<td colspan="9" style="text-align: right; margin-right: 10px; padding-top: 30px">
-						
-										
-	 				</td>    		
-	 	   		</tr>
 	 	    	</tfoot>
 	 	    </table>
 	 	    <?php } ?>
 
 			<!-- END CONTENT -->
-			</form>	
-		</div>
-		<div class="sidebar">	
-			<?php include 'menu.php'; ?>
-		</div>
-		<div class="clear"></div>		
+		</form>
 	</div>
-    <?php include "../footer.php" ?>	
+	<p class="spacer"></p>
 </div>
+<?php include "../../intranet/{$_SESSION['__mod_area__']}/footer.php" ?>
 </body>
 </html>
