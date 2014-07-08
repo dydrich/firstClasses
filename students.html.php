@@ -13,7 +13,7 @@
 	<script type="text/javascript" src="../../js/page.js"></script>
 	<script type="text/javascript">
 	var colors_and_classes = new Array();
-	var delete_on_assign = <?php if($_REQUEST['q'] == "not_assigned") print("true"); else print("false") ?>;
+	var delete_on_assign = <?php if(isset($_REQUEST['q']) && $_REQUEST['q'] == "not_assigned") print("true"); else print("false") ?>;
 	<?php
 	foreach($classes_and_colors as $a){
 	?>
@@ -23,50 +23,51 @@
 
 	var update_class = function(id, sel){
 		cl = sel.value;
-		var req = new Ajax.Request('upd_class.php',
-				  {
-				        method:'post',
-				        parameters: {std: id, cl: cl},
-				        onSuccess: function(transport){
-				            var response = transport.responseText || "no response text";
-				            //alert(response);
-				            var dati = response.split("|");
-			                if(dati[0] == "ko"){
-								alert("Errore nell'aggiornamento della classe: "+dati[1]);
-								return false;
-			                }
-			                if(cl == "0"){
-								$('tr'+dati[1]).style.backgroundColor = "";
-								return false;
-							}
 
-							obj = colors_and_classes[cl];
-							color = obj.color;
-							if(delete_on_assign)
-								$('tr'+dati[1]).style.display = "none";
-							else
-								$('tr'+dati[1]).style.backgroundColor = "#"+color;
-				        },
-				        onFailure: function(){ alert("Si e' verificato un errore..."); }
-				  });
+		$.ajax({
+			type: "POST",
+			url: "upd_class.php",
+			data:  {std: id, cl: cl},
+			dataType: 'json',
+			error: function(data, status, errore) {
+				alert("Si e' verificato un errore");
+				return false;
+			},
+			succes: function(result) {
+				alert("ok");
+			},
+			complete: function(data, status){
+				r = data.responseText;
+				var json = $.parseJSON(r);
+				if(json.status == "kosql"){
+					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+					return;
+				}
+				else {
+					$('#not1').text(json.message);
+					$('#not1').show(1000);
+					window.setTimeout("$('#not1').hide(1000)", 2000);
+					if(cl == "0"){
+						$('#tr'+json.id).style.backgroundColor = "";
+						return false;
+					}
+
+					obj = colors_and_classes[cl];
+					color = obj.color;
+					if(delete_on_assign){
+						$('#tr'+json.id).hide();
+					}
+					else {
+						$('#tr'+json.id).style.backgroundColor = "#"+color;
+					}
+				}
+			}
+		});
 	};
 
 	var _student = function(id){
-		url = "student.php?stid="+id+"&order=<?php print $_REQUEST['order'] ?>&q=<?php print $_REQUEST['q'] ?>";
-		if(id == 0){
-			// new student
-			if(confirm("L'alunno e' un ripetente?"))
-				url = "student.php?stid=0&rip=1";
-			else
-				url = "student.php?stid=0";
-		}
-		else{
-			// update student
-
-		}
-
-		win = new Window({className: "mac_os_x", url: url, top:100, left:100,  width:400, height:400, zIndex: 100, resizable: true, title: "Dettaglio alunno", showEffect:Effect.Appear, hideEffect: Effect.Fade, draggable:true, wiredDrag: true});
-		win.showCenter(false);
+		url = "student.php?stid="+id+"&order=<?php echo $req_order ?>&q=<?php echo $q ?>";
+		document.location.href = url;
 	};
 
 	var del_std = function(stid){
@@ -102,7 +103,7 @@
 			Alunni classi prime
 		</div>
 		<div id="not1" class="notification"></div>
-		<form id="my_form" style="border: 1px solid #666666; border-radius: 10px; margin-top: 20px; text-align: left; width: 80%; margin-left: auto; margin-right: auto" method="post">
+		<form id="my_form" style="border: 1px solid #666666; border-radius: 10px; margin-top: 20px; text-align: left; width: 90%; margin-left: auto; margin-right: auto" method="post">
 	 	    <?php if($n_std < 1){ ?>
 	 	    <p style="margin-top: 20px; margin-bottom: 50px" class="_center _bold">Non hai ancora inserito nessun alunno.</p>
 	 	    <div style="width: 90%; text-align: right">
@@ -111,11 +112,11 @@
 	 	    <?php } 
 			else{	 	    
 	 	    ?>	
-	 	    <table style="border-collapse: collapse; width: 100%; margin-top: 30px">
+	 	    <table style="border-collapse: collapse; width: 90%; margin: 30px auto 20px auto">
 	 	    	<thead>
-	 	    	<tr><td style="text-align: right; padding-bottom: 20px" colspan="9"><a href="#" style="float: left" onclick="_student(0)">Aggiungi alunno</a><a href="students.php?q=assigned&order=<?php print $_REQUEST['order'] ?>">Solo alunni gi&agrave; assegnati</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="students.php?q=not_assigned&order=<?php print $_REQUEST['order'] ?>">Solo alunni non assegnati</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="students.php?order=<?php print $_REQUEST['order'] ?>">Tutti</a></td></tr>
-	 	    	<tr style="font-weight: bold">
-					<td style="width: 25%; border-bottom: 1px solid #cccccc"><a href="students.php?q=<?php print $_REQUEST['q'] ?>">Cognome e nome</a></td>
+	 	    	<tr><td style="text-align: right; padding-bottom: 20px" colspan="9"><a href="#" style="float: left" onclick="_student(0)">Aggiungi alunno</a><a href="students.php?q=assigned&order=<?php print $_REQUEST['order'] ?>">Solo alunni gi&agrave; assegnati</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="students.php?q=not_assigned&order=<?php echo $req_order ?>">Solo alunni non assegnati</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="students.php?order=<?php echo $req_order ?>">Tutti</a></td></tr>
+	 	    	<tr style="font-weight: bold; height: 30px">
+					<td style="width: 25%; border-bottom: 1px solid #cccccc"><a href="students.php?q=<?php echo $q ?>">Cognome e nome</a></td>
 					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc"><a href="students.php?order=rip&q=<?php print $_REQUEST['q'] ?>">Ripetente</a></td>
 					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc"><a href="students.php?order=h&q=<?php print $_REQUEST['q'] ?>">H / DSA</a></td>
 					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc"><a href="students.php?order=sex&q=<?php print $_REQUEST['q'] ?>">Sesso</a></td>
@@ -158,7 +159,7 @@
 					<td style="width: 11%; text-align: center; border-bottom: 1px solid #cccccc;<?php print $bck ?>"><?php print $st['class_from'] ?></td>
 					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc;<?php print $bck ?>"><?php print utf8_decode($st['note']) ?></td>
 					<td style="width: 11%; text-align: center; border-bottom: 1px solid #cccccc;<?php print $bck ?>">
-						<select id="n_class" id="n_class" style="border: 1px solid; width: 90%; font-size: 11px" onchange="update_class(<?php print $st['id_alunno'] ?>, this)">
+						<select id="n_class" name="n_class" class="form_input" style="width: 90%" onchange="update_class(<?php print $st['id_alunno'] ?>, this)">
 							<option value="0">.</option>
 							<?php 
 							foreach($classes_and_colors as $c){

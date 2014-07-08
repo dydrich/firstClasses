@@ -19,10 +19,11 @@
 			}
 			var code = $('#code').val();
 			var name = $('#nome').val();
+			var comp = ($('#is_sc').prop('checked')) ? 1 : 0;
 			$.ajax({
 				type: "POST",
 				url: "manage_schools_from.php",
-				data: {action: action, class_id: id, class_name: name, class_code: code},
+				data: {action: action, class_id: id, class_name: name, class_code: code, is_sc: comp},
 				dataType: 'json',
 				error: function(data, status, errore) {
 					alert("Si e' verificato un errore");
@@ -78,6 +79,12 @@
 				<td style='width: 40%; font-weight: bold'>Codice (max 3 lett)</td>
 				<td style='width: 60%'>
 					<input type='text' class="form_input" style='width: 90%' name='code' id='code' value='<?php if (isset($school)) echo $school['codice'] ?>' />
+				</td>
+			</tr>
+			<tr>
+				<td style='width: 40%; font-weight: bold'>Primaria comprensivo</td>
+				<td style='width: 60%'>
+					<input type='checkbox' class="form_input" name='is_sc' id='is_sc' value='1' <?php if (isset($school) && $school['comprensivo'] == 1) echo "checked" ?> />
 				</td>
 			</tr>
 			<tr>

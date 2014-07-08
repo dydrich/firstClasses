@@ -1,95 +1,101 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>Area dirigenza::gestione nuove classi</title>
-<link rel="stylesheet" href="../styles.css" type="text/css" />
-<link href="/css/themes/default.css" rel="stylesheet" type="text/css"/>
-<link href="/css/themes/mac_os_x.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="/js/page.js"></script>
-<?php include $_ENV["DOCUMENT_ROOT"]."/js/prototype.php" ?>
-<script type="text/javascript" src="/js/window.js"></script>
-<script type="text/javascript" src="/js/window_effects.js"></script>
-<script type="text/javascript">
-var win;
-var upd_grade = function(sel, stid){
-	var grade = sel.value;
-	var req = new Ajax.Request('upd_grade.php',
-			  {
-			    	method:'post',
-			    	parameters: {stid: stid, grade: grade, cl: <?php print $_REQUEST['class_id'] ?>},
-			    	onSuccess: function(transport){
-			      		var response = transport.responseText || "no response text";
-			      		//alert(response);
-			      		var dati = response.split("|");
-		            	if(dati[0] == "ko"){
-							alert("Errore nell'aggiornamento del voto: "+dati[1]);
-							return false;
-		            	}
-		            	$('avg').innerHTML = dati[1];            	
-			    	},
-			    	onFailure: function(){ alert("Si e' verificato un errore..."); }
-			  });
-};
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<title><?php print $_SESSION['__config__']['intestazione_scuola'] ?>:: classi prime scuola secondaria</title>
+	<link rel="stylesheet" href="../../css/reg.css" type="text/css" media="screen,projection" />
+	<link rel="stylesheet" href="../../css/general.css" type="text/css" media="screen,projection" />
+	<link rel="stylesheet" href="theme/style.css" type="text/css" media="screen,projection" />
+	<link rel="stylesheet" href="../../js/jquery_themes/custom-theme/jquery-ui-1.10.3.custom.min.css" type="text/css" media="screen,projection" />
+	<script type="text/javascript" src="../../js/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../js/jquery-ui-1.10.3.custom.min.js"></script>
+	<script type="text/javascript" src="../../js/jquery-ui-timepicker-addon.js"></script>
+	<script type="text/javascript" src="../../js/page.js"></script>
+	<script type="text/javascript">
+	var cls_desc;
+	var upd_grade = function(sel, stid){
+		var grade = sel.value;
+		var req = new Ajax.Request('upd_grade.php',
+				  {
+				        method:'post',
+				        parameters: {stid: stid, grade: grade, cl: <?php print $_REQUEST['class_id'] ?>},
+				        onSuccess: function(transport){
+				            var response = transport.responseText || "no response text";
+				            //alert(response);
+				            var dati = response.split("|");
+			                if(dati[0] == "ko"){
+								alert("Errore nell'aggiornamento del voto: "+dati[1]);
+								return false;
+			                }
+			                $('avg').innerHTML = dati[1];
+				        },
+				        onFailure: function(){ alert("Si e' verificato un errore..."); }
+				  });
+	};
 
-var mod_class = function(){
-	win = new Window({className: "mac_os_x", width:200, height:null, zIndex: 100, resizable: true, title: "Modifica classe", showEffect:Effect.Appear, hideEffect: Effect.Fade, draggable:true, wiredDrag: true});
-	win.getContent().update("<table style='width: 95%; margin: auto; padding-top: 20px;'><tr><td style='width: 40%; font-weight: bold'>Classe</td><td style='width: 60%'><input type='text' style='width: 90%; border: 1px solid #dddddd; font-size: 11px' name='nome' id='nome' value='<?php print $sc['descrizione'] ?>' /></tr><tr><td colspan='2' style='padding-top: 20px; text-align: right; padding-right: 5%'><a href='#' onclick='_upd_class(1)'>Salva</a></td></tr></table>");
-	win.showCenter(false);
-};
-
-var _upd_class = function(action){
-	if(action == 3){
-		if(!confirm("Sei sicuro di voler cancellare la classe? Dovrai poi assegnare gli studenti ad un'altra classe."))
+	var mod_class = function(){
+		var new_desc = prompt("Inserisci il nome della classe");
+		if (new_desc == ""){
 			return false;
-		name = "";
-	}
-	else{
-		name = $('nome').value;
-	}
-	var cl = <?php print(isset($_REQUEST['class_id']) ? $_REQUEST['class_id'] : 0) ?>;
-	var req = new Ajax.Request('manage_classes_from.php',
-			  {
-			    	method:'post',
-			    	parameters: {action: action, class_id: cl, class_name: name},
-			    	onSuccess: function(transport){
-			      		var response = transport.responseText || "no response text";
-			      		//alert(response);
-			      		var dati = response.split("#");
-		            	if(dati[0] == "ko"){
-							alert("Errore nell'aggiornamento: "+dati[1]);
-							return false;
-		            	}
-		            	if(action == 1){
-		            		$('cls_d').innerHTML = name;
-		            		win.close();
-		            	}
-		            	else if(action == 3){
-							document.location.href = "schools.php";
-		            	}      	
-			    	},
-			    	onFailure: function(){ alert("Si e' verificato un errore..."); }
-			  });
-};
-</script>
-<style>
-td {border: 0}
-</style>
-</head>
+		}
+		cls_desc = new_desc;
+		_upd_class(1);
+	};
+
+	var _upd_class = function(action){
+		if(action == 3){
+			if(!confirm("Sei sicuro di voler cancellare la classe? Dovrai poi assegnare gli studenti ad un'altra classe."))
+				return false;
+		}
+
+		var cl = <?php print(isset($_REQUEST['class_id']) ? $_REQUEST['class_id'] : 0) ?>;
+		$.ajax({
+			type: "POST",
+			url: "manage_classes_from.php",
+			data: {action: action, class_id: cl, class_name: cls_desc},
+			dataType: 'json',
+			error: function(data, status, errore) {
+				alert("Si e' verificato un errore");
+				return false;
+			},
+			succes: function(result) {
+				alert("ok");
+			},
+			complete: function(data, status){
+				r = data.responseText;
+				var json = $.parseJSON(r);
+				if(json.status == "kosql"){
+					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+					return;
+				}
+				else {
+					$('#not1').text(json.message);
+					$('#not1').show(1000);
+					window.setTimeout("$('#not1').hide(1000)", 2000);
+					if(action == 1){
+						$('#cls_d').text(cls_desc);
+					}
+					else if(action == 3){
+						document.location.href = "schools.php";
+					}
+				}
+			}
+		});
+	};
+	</script>
 <body>
-<div class="pagewidth">
-	<div class="header">
-		<!-- TITLE -->
-		<h1><a href="htp://www.scuolamediatre.it">Scuola Media Statale Iglesias</a></h1>
-		<h2>Area riservata::dirigenza</h2>
-		<!-- END TITLE -->
+<?php include "../../intranet/{$_SESSION['__mod_area__']}/header.php" ?>
+<?php include "navigation.php" ?>
+<div id="main">
+	<div id="right_col">
+		<?php include "menu.php" ?>
 	</div>
-	<?php include "navbar.php" ?>
-	<div class="page-wrap">
-		<div class="content">	
-			<!-- CONTENT -->
-            <h3><?php print $sc['sc'] ?>:: classe <span id="cls_d"><?php print $sc['descrizione'] ?></span><span style="float: right; margin-right: 10%; font-size: 13px"><a href="#" onclick="mod_class()">Modifica classe</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="#" onclick="_upd_class(3)">Cancella classe</a></span></h3>
-            <form action="" method="post">
+	<div id="left_col">
+		<div style="width: 95%; height: 30px; margin: 10px auto 0 auto; text-align: center; font-size: 1.1em; text-transform: uppercase">
+			<?php print $sc['sc'] ?>:: classe <span id="cls_d"><?php print $sc['descrizione'] ?></span>
+		</div>
+		<div id="not1" class="notification"></div>
+		<form id="my_form" style="border: 1px solid #aaaaaa; border-radius: 10px; margin-top: 20px; text-align: left; width: 80%; margin-left: auto; margin-right: auto" method="post">
 	 	    <table style="border-collapse: collapse; width: 100%; margin-top: 10px">
 	 	    <thead>
 	 	    	<tr>
@@ -227,14 +233,14 @@ td {border: 0}
 	 	    	</tfoot>
 	 	    </table>
 			<!-- END CONTENT -->
-			</form>	
+			</form>
+		<div style="width: 90%; text-align: right; margin-top: 20px">
+			<a href="#" onclick="mod_class()" class="standard_link nav_link_first">Modifica classe</a>
+			|<a href="#" onclick="_upd_class(3)" class="standard_link nav_link_last">Cancella classe</a>
 		</div>
-		<div class="sidebar">	
-			<?php include 'menu.php'; ?>
-		</div>
-		<div class="clear"></div>		
 	</div>
-    <?php include "../footer.php" ?>	
+	<p class="spacer"></p>
 </div>
+<?php include "../../intranet/{$_SESSION['__mod_area__']}/footer.php" ?>
 </body>
 </html>

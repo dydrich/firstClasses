@@ -10,10 +10,10 @@ $response = array("status" => "ok", "message" => "Operazione completata");
 
 switch($_REQUEST['action']){
 	case "1":
-		$query = "UPDATE rb_fc_scuole_provenienza SET descrizione = '".$_REQUEST['class_name']."', codice = '".$_REQUEST['class_code']."' WHERE id_scuola = ".$_REQUEST['class_id'];
+		$query = "UPDATE rb_fc_scuole_provenienza SET descrizione = '".$_REQUEST['class_name']."', codice = '".$_REQUEST['class_code']."', comprensivo = '{$_REQUEST['is_sc']}' WHERE id_scuola = ".$_REQUEST['class_id'];
 		break;
 	case "2":
-		$query = "INSERT INTO rb_fc_scuole_provenienza (descrizione, codice) VALUES ('".$_REQUEST['class_name']."', '".$_REQUEST['class_code']."')";
+		$query = "INSERT INTO rb_fc_scuole_provenienza (descrizione, codice, comprensivo) VALUES ('".$_REQUEST['class_name']."', '".$_REQUEST['class_code']."', {$_REQUEST['is_sc']})";
 		break;
 	case "3":
 		$query = "DELETE FROM rb_fc_scuole_provenienza WHERE id_scuola = ".$_REQUEST['class_id'];

@@ -13,35 +13,71 @@
 	<script type="text/javascript">
 	var _classes = function(){
 		var _cls = prompt("Inserisci le sezioni che vuoi creare, separate da una virgola");
-		if(trim(_cls) == ""){
+
+		if(_cls == "" || _cls == null){
 			alert("Non hai inserito nessuna sezione");
 			return false;
 		}
-		document.forms[0].cls.value = _cls;
-		document.forms[0].submit();
+		$.ajax({
+			type: "POST",
+			url: "class_manager.php",
+			data: {action: 1, id: 0, name: _cls},
+			dataType: 'json',
+			error: function(data, status, errore) {
+				alert("Si e' verificato un errore");
+				return false;
+			},
+			succes: function(result) {
+				alert("ok");
+			},
+			complete: function(data, status){
+				r = data.responseText;
+				var json = $.parseJSON(r);
+				if(json.status == "kosql"){
+					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+					return;
+				}
+				else {
+					$('#not1').text(json.message);
+					$('#not1').show(1000);
+					window.setTimeout("$('#not1').hide(1000)", 2000);
+				}
+			}
+		});
 	};
 
 	var del_cls = function(id){
-		if(!confirm("Sei sicuro di voler cancellare questa classe?"))
+		if(!confirm("Sei sicuro di voler cancellare questa classe?")){
 			return false;
+		}
 
-		var req = new Ajax.Request('del_cls.php',
-				  {
-				        method:'post',
-				        parameters: {id: id},
-				        onSuccess: function(transport){
-				            var response = transport.responseText || "no response text";
-				            //alert(response);
-				            var dati = response.split(";");
-			                if(dati[0] == "ko"){
-								alert("Errore nella cancellazione della classe: "+dati[1]);
-								return false;
-			                }
-			                $('tr'+dati[1]).style.display = "none";
-				        },
-				        onFailure: function(){ alert("Si e' verificato un errore..."); }
-				  });
-
+		$.ajax({
+			type: "POST",
+			url: "class_manager.php",
+			data: {action: 2, id: id, name: ""},
+			dataType: 'json',
+			error: function(data, status, errore) {
+				alert("Si e' verificato un errore");
+				return false;
+			},
+			succes: function(result) {
+				alert("ok");
+			},
+			complete: function(data, status){
+				r = data.responseText;
+				var json = $.parseJSON(r);
+				if(json.status == "kosql"){
+					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+					return;
+				}
+				else {
+					$('#not1').text(json.message);
+					$('#not1').show(1000);
+					window.setTimeout("$('#not1').hide(1000)", 2000);
+					$('#tr'+json.id).hide();
+				}
+			}
+		});
 	};
 	</script>
 </head>
@@ -54,10 +90,10 @@
 	</div>
 	<div id="left_col">
 		<div style="width: 95%; height: 30px; margin: 10px auto 0 auto; text-align: center; font-size: 1.1em; text-transform: uppercase">
-			Alunni classi prime
+			Classi prime
 		</div>
 		<div id="not1" class="notification"></div>
-		<form id="my_form" style="border: 1px solid #666666; border-radius: 10px; margin-top: 20px; text-align: left; width: 80%; margin-left: auto; margin-right: auto" method="post">
+		<form id="my_form" style="border: 1px solid #666666; border-radius: 10px; margin-top: 20px; text-align: left; width: 90%; margin-left: auto; margin-right: auto" method="post">
 	 	    <?php if($n_cls < 1){ ?>
 	 	    <p style="margin-top: 20px; margin-bottom: 50px" class="_bold _center">Non hai ancora inserito nessuna classe.</p>
 	 	    <div style="width: 90%; text-align: right">
@@ -67,7 +103,7 @@
 	 	    <?php
 	        } else{
 	 	    ?>	
-	 	    <table style="border-collapse: collapse; width: 95%; margin-top: 30px">
+	 	    <table style="border-collapse: collapse; width: 95%; margin: 30px auto 20px auto">
 	 	    	<thead>
 	 	    	<tr style="font-weight: bold">
 					<td style="width: 13%; border-bottom: 1px solid #cccccc">Classe</td>
@@ -83,7 +119,7 @@
 	 	    	<tbody>
 	 	    	<?php
 	 	    	while($cl = $res_classes->fetch_assoc()) {
-	 	    		$sel_sex = "SELECT sesso, COUNT(sesso) AS count FROM fc_alunni WHERE id_classe = ".$cl['id']." GROUP BY sesso";
+	 	    		$sel_sex = "SELECT sesso, COUNT(sesso) AS count FROM rb_fc_alunni WHERE id_classe = ".$cl['id']." GROUP BY sesso";
 	 	    		$res_sex = $db->executeQuery($sel_sex);
 	 	    		$male = $female = 0;
 	 	    		while($sx = $res_sex->fetch_assoc()){
@@ -92,10 +128,10 @@
 						else
 							$female = $sx['count'];
 	 	    		}
-	 	    		$sel_rip = "SELECT COUNT(id_alunno) FROM fc_alunni WHERE id_classe = ".$cl['id']." AND ripetente = 1";
+	 	    		$sel_rip = "SELECT COUNT(id_alunno) FROM rb_fc_alunni WHERE id_classe = ".$cl['id']." AND ripetente = 1";
 	 	    		$ripetenti = $db->executeCount($sel_rip); 
 	 	    		
-	 	    		$sel_h = "SELECT H FROM fc_alunni WHERE id_classe = ".$cl['id']." AND H IS NOT NULL AND H <> 0";
+	 	    		$sel_h = "SELECT H FROM rb_fc_alunni WHERE id_classe = ".$cl['id']." AND H IS NOT NULL AND H <> 0";
 	 	    		$res_h = $db->executeQuery($sel_h);
 	 	    		$h = $dsa = 0;
 	 	    		while($al = $res_h->fetch_assoc()){
@@ -104,11 +140,11 @@
 	 	    			if($al['H'] > 1)
 	 	    				$h++;	
 	 	    		}
-	 	    		$sel_avg = "SELECT ROUND(AVG(voto), 2) FROM fc_alunni WHERE id_classe = ".$cl['id'];
+	 	    		$sel_avg = "SELECT ROUND(AVG(voto), 2) FROM rb_fc_alunni WHERE id_classe = ".$cl['id'];
 	 	    		$avg = $db->executeCount($sel_avg);
 	 	    	?>
 	 	    	<tr id="tr<?php print $cl['id'] ?>">
-					<td style="width: 13%; border-bottom: 1px solid #cccccc"><a href="class.php?id_classe=<?php print $cl['id'] ?>"><?php print $cl['descrizione'] ?></a></td>
+					<td style="width: 13%; border-bottom: 1px solid #cccccc"><a href="classe_prima.php?id_classe=<?php print $cl['id'] ?>"><?php print $cl['descrizione'] ?></a></td>
 					<td style="width: 13%; text-align: center; border-bottom: 1px solid #cccccc"><?php print $cl['alunni'] ?></td>
 					<td style="width: 13%; text-align: center; border-bottom: 1px solid #cccccc"><?php print $ripetenti ?></td>
 					<td style="width: 13%; text-align: center; border-bottom: 1px solid #cccccc"><?php print $male ?></td>
@@ -122,7 +158,7 @@
 	 	    	<tfoot>
 	 	   		<tr>
 	 				<td colspan="8" style="text-align: right; margin-right: 10px; padding-top: 30px">
-						<a href="#" style="" onclick="_classes()">Aggiungi classi</a>
+						<a href="#" class="standard_link" onclick="_classes()">Aggiungi classi</a>
 						<input type="hidden" name="cls" id="cls" /> 				
 	 				</td>    		
 	 	   		</tr>

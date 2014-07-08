@@ -10,41 +10,51 @@
 	<script type="text/javascript" src="../../js/jquery-ui-1.10.3.custom.min.js"></script>
 	<script type="text/javascript" src="../../js/jquery-ui-timepicker-addon.js"></script>
 	<script type="text/javascript" src="../../js/page.js"></script>
-<script type="text/javascript">
-var save = function(_continue){
-	var req = new Ajax.Request('manage_student.php?action=2',
-			  {
-			    	method:'post',
-			    	asynchronous: false,
-			    	parameters: $('_form').serialize(true),
-			    	onSuccess: function(transport){
-			      		var response = transport.responseText || "no response text";
-			      		//alert(response);
-			      		var dati = response.split("|");
-		            	if(dati[0] == "ko"){
-							alert(dati[1]);
-							return false;
-		            	}
-		            	if(!_continue)
-		            		document.location.href = "students.php";
-		            	else{
-							$('fname').value = "";
-							$('lname').value = "";
-							$('from').selectedIndex = 0;
-							$('sex').selectedIndex = 0;
-							$('h').selectedIndex = 0;
-							$('diagnose').innerHTML = "";
-							$('tr_diag').style.display = "none";
-							$('grade').selectedIndex = 0;
-							$('note').innerHTML = "";
-							$('note').value = "";
-							$('fname').focus();
-		            	}
-			    	},
-			    	onFailure: function(){ alert("Si e' verificato un errore..."); }
-			  });
-};
-</script>
+	<script type="text/javascript">
+	var save = function(_continue){
+		$.ajax({
+			type: "POST",
+			url: "manage_student.php?action=2",
+			data: $('#my_form').serialize(true),
+			dataType: 'json',
+			error: function(data, status, errore) {
+				alert("Si e' verificato un errore");
+				return false;
+			},
+			succes: function(result) {
+				alert("ok");
+			},
+			complete: function(data, status){
+				r = data.responseText;
+				var json = $.parseJSON(r);
+				if(json.status == "kosql"){
+					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+					return;
+				}
+				else {
+					$('#not1').text(json.message);
+					$('#not1').show(1000);
+					window.setTimeout("$('#not1').hide(1000)", 2000);
+					if(!_continue)
+						document.location.href = "students.php";
+					else{
+						$('#fname').text("");
+						$('#lname').text("");
+						$('#from').selectedIndex = 0;
+						$('#sex').selectedIndex = 0;
+						$('#h').selectedIndex = 0;
+						$('#diagnose').text("");
+						$('#tr_diag').style.display = "none";
+						$('#grade').selectedIndex = 0;
+						$('#note').text("");
+						$('#note').val("");
+						$('#fname').focus();
+					}
+				}
+			}
+		});
+	};
+	</script>
 </head>
 <body onload="$('fname').focus()">
 <?php include "../../intranet/{$_SESSION['__mod_area__']}/header.php" ?>

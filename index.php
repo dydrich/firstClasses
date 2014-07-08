@@ -14,7 +14,7 @@ $n_cls = $res_classes->num_rows;
 $sel_students = "SELECT COUNT(id_alunno) FROM rb_fc_alunni";
 $n_std = $db->executeCount($sel_students);
 if($n_std > 0){
-	$sel_not_assigned = "SELECT COUNT(id_alunno) FROM fc_alunni WHERE id_classe IS NULL";
+	$sel_not_assigned = "SELECT COUNT(id_alunno) FROM rb_fc_alunni WHERE id_classe IS NULL";
 	$not_assigned = $db->executeCount($sel_not_assigned);
 }
 

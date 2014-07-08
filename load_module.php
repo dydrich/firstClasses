@@ -25,6 +25,13 @@ $_SESSION['__mod_area__'] = $_REQUEST['area'];
 
 $uid = $_SESSION['__user__']->getUid();
 
+$sel_colors = "SELECT * FROM rb_fc_backgrounds ORDER BY id";
+$res_colors = $db->executeQuery($sel_colors);
+$_SESSION['__colors__'] = array();
+while($color = $res_colors->fetch_assoc()){
+	$_SESSION['__colors__'][$color['id']] = array("color" => $color['colore'], "is_used" => false);
+}
+
 if (isset($_REQUEST['page'])){
 	header("Location: {$_REQUEST['page']}.php");
 }

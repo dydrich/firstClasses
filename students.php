@@ -7,7 +7,9 @@ check_permission(DIR_PERM);
 
 $query_params = "";
 $order = "cognome, nome";
+$req_order = "";
 if(isset($_REQUEST['order'])){
+	$req_order = $_REQUEST['order'];
 	switch ($_REQUEST['order']){
 		case "from":
 			$order = "rb_fc_alunni.classe_provenienza, cognome, nome";
@@ -32,7 +34,9 @@ if(isset($_REQUEST['order'])){
 		break;
 	}
 }
+$q = "";
 if(isset($_REQUEST['q'])){
+	$q = $_REQUEST['q'];
 	switch($_REQUEST['q']){
 		case "assigned":
 			$query_params = "AND rb_fc_alunni.id_classe IS NOT NULL";

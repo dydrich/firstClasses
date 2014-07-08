@@ -1,39 +1,43 @@
 <?php
 
-include "../../../lib/start.php";
-
-ini_set("display_errors", "1");
+include "../../lib/start.php";
 
 check_session();
-check_permission(DIR_PERM|DSG_PERM);
+check_permission(DIR_PERM);
 
-header("Content-type: text/plain");
+header("Content-type: application/json");
+$response = array("status" => "ok", "message" => "Operazione completata");
 
 $id = $_REQUEST['id'];
-$sede = $_REQUEST['sede'];
-$tp = $_REQUEST['tp'];
-$classe = substr($_REQUEST['name'], 0, 1);
-$sezione = substr($_REQUEST['name'], 1, 1);
 
 switch($_REQUEST['action']){
 	case "1":
-		$sel_max = "SELECT MAX(id_classe) FROM nuove_classi";
-		$max = $db->executeCount($sel_max);
-		$id = ++$max;
-		$statement = "INSERT INTO nuove_classi (id_classe, classe, sezione, sede, tempo_prolungato) VALUES ($id, $classe, '".$sezione."', $sede, $tp)";
+		$sezioni = explode(",", $_REQUEST['name']);
+		$statement = "INSERT INTO rb_fc_classi (descrizione) VALUES ";
+		foreach ($sezioni as $sezione) {
+			$statement .= "('1".$sezione."'),";
+		}
 		$error = "Errore nella creazione della classe";
+		$statement = substr($statement, 0, strlen($statement) - 1);
 		break;
 	case "2":
-		$statement = "DELETE FROM nuove_classi WHERE id_classe = $id";
+		$upd = "UPDATE rb_fc_alunni SET id_classe = NULL WHERE id_classe = {$id}";
+		$db->executeUpdate($upd);
+		$statement = "DELETE FROM rb_fc_classi WHERE id_classe = {$id}";
 		$error = "Errore nella cancellazione della classe";
 		break;
 }
 try{
-	$res = $db->executeQuery($statement);
+	$res = $db->execute($statement);
 } catch (MySQLException $ex){
-	print ("ko|$error|".$ex->getQuery()."|".$ex->getMessage());
+	$response['status'] = "kosql";
+	$response['message'] = $ex->getMessage();
+	$response['query'] = $ex->getQuery();
+	$response['error'] = $error;
+	echo json_encode($response);
 	exit;
 }
 
-print "ok|$id";
+$response['id'] = $id;
+echo json_encode($response);
 exit;

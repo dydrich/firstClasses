@@ -3,7 +3,7 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<title><?php print $_SESSION['__config__']['intestazione_scuola'] ?>:: classi prime scuola secondaria</title>
-	<link rel="stylesheet" href="../../intranet/teachers/reg.css" type="text/css" media="screen,projection" />
+	<link rel="stylesheet" href="../../css/reg.css" type="text/css" media="screen,projection" />
 	<link rel="stylesheet" href="theme/style.css" type="text/css" media="screen,projection" />
 	<link rel="stylesheet" href="../../js/jquery_themes/custom-theme/jquery-ui-1.10.3.custom.min.css" type="text/css" media="screen,projection" />
 	<script type="text/javascript" src="../../js/jquery-2.0.3.min.js"></script>
@@ -14,34 +14,115 @@
 	var win;
 
 	var add_class = function(school){
-		win = new Window({className: "mac_os_x", width:200, height:null, zIndex: 100, resizable: true, title: "Nuova classe", showEffect:Effect.Appear, hideEffect: Effect.Fade, draggable:true, wiredDrag: true});
-		win.getContent().update("<table style='width: 95%; margin: auto; padding-top: 20px;'><tr><td style='width: 40%; font-weight: bold'>Classe</td><td style='width: 60%'><input type='text' style='width: 90%; border: 1px solid #dddddd; font-size: 11px' name='nome' id='nome' /></tr><tr><td colspan='2' style='padding-top: 20px; text-align: right; padding-right: 5%'><a href='#' onclick='_upd_class("+school+")'>Salva</a></td></tr></table>");
-		win.showCenter(false);
+		var cls = prompt("Inserisci le classi (nel formato 5A), separate da una virgola");
+		if (cls == ""  || cls == null){
+			return false;
+		}
+		_upd_class(school, cls);
 	};
 
-	var _upd_class = function(school){
-		var name = $('nome').value;
-		var req = new Ajax.Request('manage_classes_from.php',
-				  {
-				        method:'post',
-				        parameters: {action: '2', school_id: school, class_name: name},
-				        onSuccess: function(transport){
-				            var response = transport.responseText || "no response text";
-				            //alert(response);
-				            var dati = response.split("#");
-			                if(dati[0] == "ko"){
-								alert("Errore nell'inserimento: "+dati[1]);
-								return false;
-			                }
-			                var lnk2 = document.createElement("a");
-							lnk2.setAttribute("href", "class_from.php?class_id="+dati[1]);
-							lnk2.setAttribute("style", "text-decoration: none; font-weight: bold;");
-							lnk2.appendChild(document.createTextNode(name));
-							$('sp_'+school).appendChild(lnk2);
-							win.close();
-				        },
-				        onFailure: function(){ alert("Si e' verificato un errore..."); }
-				  });
+	var import_class = function(school){
+		$.ajax({
+			type: "POST",
+			url: "manage_classes_from.php",
+			data: {action: '4', school_id: school},
+			dataType: 'json',
+			error: function(data, status, errore) {
+				alert("Si e' verificato un errore");
+				return false;
+			},
+			succes: function(result) {
+				alert("ok");
+			},
+			complete: function(data, status){
+				r = data.responseText;
+				var json = $.parseJSON(r);
+				if(json.status == "kosql"){
+					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+					return;
+				}
+				else {
+					$('#not1').text(json.message);
+					$('#not1').show(1000);
+					window.setTimeout("$('#not1').hide(1000)", 2000);
+					var _cls = json.classi;
+					var max = json.max;
+					var _arr_cls = _cls.split(",");
+					if (_arr_cls.length == 1){
+						var lnk2 = document.createElement("a");
+						lnk2.setAttribute("href", "class_from.php?class_id="+max);
+						lnk2.setAttribute("style", "text-decoration: none; font-weight: bold;");
+						lnk2.appendChild(document.createTextNode(""+_cls));
+						$('#sp_'+school).append(lnk2);
+					}
+					else {
+						start = max - _arr_cls.length + 1;
+						for (var i = 0; i < _arr_cls.length; i++){
+							var lnk2 = document.createElement("a");
+							lnk2.setAttribute("href", "class_from.php?class_id="+start);
+							lnk2.setAttribute("style", "text-decoration: none; font-weight: bold; margin-left: 10px");
+							lnk2.appendChild(document.createTextNode(""+_arr_cls[i]));
+							$('#sp_'+school).append(lnk2);
+							start++;
+						}
+					}
+
+					//document.location.href = document.location.href;
+				}
+			}
+		});
+	};
+
+	var _upd_class = function(school, cls){
+		$.ajax({
+			type: "POST",
+			url: "manage_classes_from.php",
+			data: {action: '2', school_id: school, class_names: cls},
+			dataType: 'json',
+			error: function(data, status, errore) {
+				alert("Si e' verificato un errore");
+				return false;
+			},
+			succes: function(result) {
+				alert("ok");
+			},
+			complete: function(data, status){
+				r = data.responseText;
+				var json = $.parseJSON(r);
+				if(json.status == "kosql"){
+					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+					return;
+				}
+				else {
+					$('#not1').text(json.message);
+					$('#not1').show(1000);
+					window.setTimeout("$('#not1').hide(1000)", 2000);
+					var _cls = json.classi;
+					var max = json.max;
+					var _arr_cls = _cls.split(",");
+					if (_arr_cls.length == 1){
+						var lnk2 = document.createElement("a");
+						lnk2.setAttribute("href", "class_from.php?class_id="+max);
+						lnk2.setAttribute("style", "text-decoration: none; font-weight: bold;");
+						lnk2.appendChild(document.createTextNode("5"+_cls));
+						$('#sp_'+school).append(lnk2);
+					}
+					else {
+						start = max - _arr_cls.length + 1;
+						for (var i = 0; i < _arr_cls.length; i++){
+							var lnk2 = document.createElement("a");
+							lnk2.setAttribute("href", "class_from.php?class_id="+start);
+							lnk2.setAttribute("style", "text-decoration: none; font-weight: bold; margin-left: 10px");
+							lnk2.appendChild(document.createTextNode("5"+_arr_cls[i]));
+							$('#sp_'+school).append(lnk2);
+							start++;
+						}
+					}
+
+					//document.location.href = document.location.href;
+				}
+			}
+		});
 	};
 	</script>
 	<style>
@@ -65,25 +146,24 @@
             <?php
             $x = 0;
             while(list($k, $school) = each($schools)){
-            	list($desc, $code) = explode("#", $school[0]);
             ?>
             <tr id="tr<?php print $k ?>" style="border-bottom: 1px solid rgba(211, 222, 199, 0.6);">
-            	<td style="width: 50%">
-            		<a id="sc<?php print $k ?>" href='dettaglio_scuola.php?id=<?php print $k ?>' style='font-size: 14px; font-weight: normal; margin-left: 0px; text-decoration: none'>
-					<?php print $desc ?>
+            	<td style="width: 50%; padding: 2px" class="<?php if ($school['comprensivo'] == 1) echo "attention" ?>">
+            		<a id="sc<?php print $k ?>" href='dettaglio_scuola.php?id=<?php print $k ?>' style='font-size: 13px; font-weight: normal; margin-left: 0px; text-decoration: none' class="<?php if ($school['comprensivo'] == 1) echo "attention" ?>">
+					<?php print $school['descrizione'] ?>
 					</a>
 				</td>
 				<td style="width: 50%" id="tr_2_<?php print $k ?>">
 				<span id="sp_<?php print $k ?>">
 			<?php
-				foreach($school[1] as $s){
+				foreach($school['classi'] as $s){
 			?>
-            	<a href="class_from.php?class_id=<?php print $s['class_id'] ?>" style="text-decoration: none; font-weight: bold;"><?php print $s['class'] ?></a>&nbsp;&nbsp;&nbsp;&nbsp;
+            	<a href="class_from.php?class_id=<?php print $s['class_id'] ?>" style="text-decoration: none; font-weight: bold;" class="<?php if ($school['comprensivo'] == 1) echo "attention" ?>"><?php print $s['class'] ?></a>&nbsp;&nbsp;&nbsp;&nbsp;
             <?php 
             	}
             ?>
             	</span>
-            	(<a href="#" id="last<?php print $k ?>" onclick="add_class(<?php print $k ?>)" style="text-decoration: none; font-weight: bold;">+</a>)&nbsp;&nbsp;&nbsp;&nbsp;
+            	(<a href="#" id="last<?php print $k ?>" onclick="<?php if ($school['comprensivo'] != 1){ ?>add_class<?php } else { ?>import_class<?php } ?>(<?php print $k ?>)" style="text-decoration: none; font-weight: bold;">+</a>)&nbsp;&nbsp;&nbsp;&nbsp;
             	</td>
             </tr>
             <?php
