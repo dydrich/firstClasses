@@ -105,7 +105,7 @@
 	 	    ?>	
 	 	    <table style="border-collapse: collapse; width: 95%; margin: 30px auto 20px auto">
 	 	    	<thead>
-	 	    	<tr style="font-weight: bold">
+	 	    	<tr style="font-weight: bold; height: 30px">
 					<td style="width: 13%; border-bottom: 1px solid #cccccc">Classe</td>
 					<td style="width: 13%; text-align: center; border-bottom: 1px solid #cccccc">Alunni</td>
 					<td style="width: 13%; text-align: center; border-bottom: 1px solid #cccccc">Ripetenti</td>
@@ -167,8 +167,8 @@
 	 	    <?php } ?>
 
 			<!-- END CONTENT -->
-			</form>	
-		</div>
+		</form>
+	</div>
 	<p class="spacer"></p>
 </div>
 <?php include "../../intranet/{$_SESSION['__mod_area__']}/footer.php" ?>

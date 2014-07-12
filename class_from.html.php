@@ -15,27 +15,36 @@
 	var cls_desc;
 	var upd_grade = function(sel, stid){
 		var grade = sel.value;
-		var req = new Ajax.Request('upd_grade.php',
-				  {
-				        method:'post',
-				        parameters: {stid: stid, grade: grade, cl: <?php print $_REQUEST['class_id'] ?>},
-				        onSuccess: function(transport){
-				            var response = transport.responseText || "no response text";
-				            //alert(response);
-				            var dati = response.split("|");
-			                if(dati[0] == "ko"){
-								alert("Errore nell'aggiornamento del voto: "+dati[1]);
-								return false;
-			                }
-			                $('avg').innerHTML = dati[1];
-				        },
-				        onFailure: function(){ alert("Si e' verificato un errore..."); }
-				  });
+
+		$.ajax({
+			type: "POST",
+			url: "upd_grade.php",
+			data: {stid: stid, grade: grade, cl: <?php print $_REQUEST['class_id'] ?>},
+			dataType: 'json',
+			error: function(data, status, errore) {
+				alert("Si e' verificato un errore");
+				return false;
+			},
+			succes: function(result) {
+				alert("ok");
+			},
+			complete: function(data, status){
+				r = data.responseText;
+				var json = $.parseJSON(r);
+				if(json.status == "kosql"){
+					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+					return;
+				}
+				else {
+					$('#avg').text(json.avg);
+				}
+			}
+		});
 	};
 
 	var mod_class = function(){
 		var new_desc = prompt("Inserisci il nome della classe");
-		if (new_desc == ""){
+		if (new_desc == "" || new_desc == null){
 			return false;
 		}
 		cls_desc = new_desc;
@@ -95,8 +104,8 @@
 			<?php print $sc['sc'] ?>:: classe <span id="cls_d"><?php print $sc['descrizione'] ?></span>
 		</div>
 		<div id="not1" class="notification"></div>
-		<form id="my_form" style="border: 1px solid #aaaaaa; border-radius: 10px; margin-top: 20px; text-align: left; width: 80%; margin-left: auto; margin-right: auto" method="post">
-	 	    <table style="border-collapse: collapse; width: 100%; margin-top: 10px">
+		<form id="my_form" style="border: 1px solid #aaaaaa; border-radius: 10px; margin-top: 20px; text-align: left; width: 90%; margin-left: auto; margin-right: auto" method="post">
+	 	    <table style="border-collapse: collapse; width: 90%; margin: 10px auto">
 	 	    <thead>
 	 	    	<tr>
 	 	    		<td colspan="4" style="text-align: center; font-weight: bold; border: 0">Riepilogo</td>
@@ -139,9 +148,9 @@
 	 	    	</tr>
 	 	    	<tr style="font-weight: bold">
 					<td style="width: 8%; border-bottom: 1px solid #cccccc; border-left: 1px solid #cccccc">Media: </td>
-					<td id="nmb_female" style="width: 8%; border-bottom: 1px solid #cccccc"><?php print $avg ?></td>
+					<td id="avg" style="width: 8%; border-bottom: 1px solid #cccccc"><?php print $avg ?></td>
 					<td style="width: 8%; border-bottom: 1px solid #cccccc">Femmine: </td>
-					<td id="avg" style="width: 8%; border-bottom: 1px solid #cccccc; border-right: 1px solid #cccccc"><?php print $female ?></td>
+					<td id="nmb_female" style="width: 8%; border-bottom: 1px solid #cccccc; border-right: 1px solid #cccccc"><?php print $female ?></td>
 					<?php 
 					$ar = array_slice($classes_and_colors, 6);
 					$index = 0;
@@ -173,14 +182,14 @@
 			</thead>
 	 	    </table>
 	 	    <p></p>
-	 	    <table style="border-collapse: collapse; width: 100%; margin-top: 30px">
+	 	    <table style="border-collapse: collapse; width: 90%; margin: 30px auto">
 	 	    	<thead>
 	 	    	<tr>
-	 	    		<td colspan="6" style="text-align: right; padding-right: 20px"><a href="class_from.php?class_id=<?php print $_REQUEST['class_id'] ?>" style="float: left">Ordina per cognome</a><span style="float: left">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="class_from.php?class_id=<?php print $_REQUEST['class_id'] ?>&order=cls" style="float: left">Ordina per classe</a></td>
+	 	    		<td colspan="6" style="text-align: right; padding: 0 20px 10px 0"><a href="class_from.php?class_id=<?php print $_REQUEST['class_id'] ?>" style="float: left">Ordina per cognome</a><span style="float: left">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="class_from.php?class_id=<?php print $_REQUEST['class_id'] ?>&order=cls" style="float: left">Ordina per classe</a></td>
 	 	    	</tr>
-	 	    	<tr style="font-weight: bold">
+	 	    	<tr style="font-weight: bold; height: 30px">
 					<td style="width: 32%; border-bottom: 1px solid #cccccc">Cognome e nome</td>
-					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc">H / DSA</td>
+					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc">BES</td>
 					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc">Sesso</td>
 					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc">Voto</td>
 					<td style="width: 35%; text-align: center; border-bottom: 1px solid #cccccc">Note</td>
@@ -190,7 +199,7 @@
 	 	    	<tbody>
 	 	    	<?php
 	 	    	while($st = $res_students->fetch_assoc()) {
-	 	    		$ripetente = ($st['ripetente'] == 1) ? "SI" : "NO";
+	 	    		$ripetente = (isset($st['ripetente']) && $st['ripetente'] == 1) ? "SI" : "NO";
 	 	    		$h = $dsa = $sost = "";
 	 	    		if($st['H'] != 0){
 	 	    			if($st['H'] < 4)
@@ -215,14 +224,7 @@
 					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc;"><?php print $sost ?></td>
 					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc;"><?php print $st['sesso'] ?></td>
 					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc;">
-						<select name="grade" id="grade" style="width: 40px; font-size: 11px; border: 1px solid #dddddd" onchange="upd_grade(this, <?php print $st['id_alunno'] ?>)">
-							<option value="0">.</option>
-							<?php 
-							for($i = 4; $i < 11; $i++){
-							?>
-								<option  <?php if($st['voto'] == $i) print "selected='selected'" ?> value="<?php print $i ?>"><?php print $i ?></option>
-							<?php } ?>
-							</select>
+						<input type="text" name="grade" id="grade" style="width: 40px; " class="form_input _right" value="<?php echo $st['voto'] ?>" onchange="upd_grade(this, <?php print $st['id_alunno'] ?>)" />
 					</td>
 					<td style="width: 35%; text-align: center; border-bottom: 1px solid #cccccc;"><?php print $st['note'] ?></td>
 					<td style="width: 3%; font-weight: bold; text-align: center; border-bottom: 1px solid #cccccc;"><a style="color: red; font-weight: bold" href="#" onclick="upd_cls(<?php print $st['id_alunno'] ?>)">x</a></td>	 	    	

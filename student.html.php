@@ -13,40 +13,45 @@
 	<script type="text/javascript">
 	var _diagnose = function(sel){
 		if(sel.value > 1)
-			$('tr_diag').style.display = "";
+			$('#tr_diag').hide();
 		else
-			$('tr_diag').style.display = "none";
+			$('#tr_diag').show();
 	};
 
-	var _close = function(){
-		//parent.document.location.href = "students.php";
-		parent.win.close();
-	};
 
 	var save = function(){
 		if($('stid').value != 0)
 			action = 1;
 		else
 			action = 2;
-		var req = new Ajax.Request('manage_student.php?action='+action,
-				  {
-				        method:'post',
-				        asynchronous: false,
-				        parameters: $('_form').serialize(true),
-				        onSuccess: function(transport){
-				            var response = transport.responseText || "no response text";
-				            //alert(response);
-				            var dati = response.split("|");
-			                if(dati[0] == "ko"){
-								alert(dati[1]+"##"+dati[2]);
-								return false;
-			                }
-			                //alert("Aggiornamento terminato");
-			                parent.win.close();
-			                parent.document.location.href = "students.php?q=<?php print $_REQUEST['q'] ?>&order=<?php print $_REQUEST['order'] ?>";
-				        },
-				        onFailure: function(){ alert("Si e' verificato un errore..."); }
-				  });
+
+		$.ajax({
+			type: "POST",
+			url: "manage_student.php",
+			data:  $('#my_form').serialize(true),
+			dataType: 'json',
+			error: function(data, status, errore) {
+				alert("Si e' verificato un errore");
+				return false;
+			},
+			succes: function(result) {
+				alert("ok");
+			},
+			complete: function(data, status){
+				r = data.responseText;
+				var json = $.parseJSON(r);
+				if(json.status == "kosql"){
+					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+					return;
+				}
+				else {
+					$('#not1').text(json.message);
+					$('#not1').show(1000);
+					window.setTimeout("$('#not1').hide(1000)", 2000);
+					window.setTimeout("document.location.href='students.php'", 2000);
+				}
+			}
+		});
 	};
 	</script>
 </head>
@@ -122,14 +127,7 @@
 			<tr>
 				<td style="width: 30%; font-weight: bold">Voto</td>
 				<td style="width: 70%">
-					<select name="grade" id="grade" style="width: 90%" class="form_input">
-						<option value="0">.</option>
-					<?php
-					for($i = 4; $i < 11; $i++){
-					?>
-						<option  <?php if($student && $student['voto'] == $i) print "selected='selected'" ?> value="<?php print $i ?>"><?php print $i ?></option>
-					<?php } ?>
-					</select>
+					<input type="text" name="grade" id="grade" style="width: 90%" class="form_input" value="<?php if (isset($student)) echo $student['voto'] ?>" />
 				</td>
 			</tr>
 			<tr>
@@ -141,14 +139,14 @@
 			<tr>
 				<td colspan="2" style="text-align: right; ">
 					<input type="hidden" name="stid" id="stid" value="<?php print $_REQUEST['stid'] ?>" />
+					<input type="hidden" name="action" id="action" value="1" />
 				</td>
 			</tr>
 		</thead>
 		</table>
 		</form>
 		<div style="width: 95%; text-align: right; margin-top: 20px">
-			<a href="#" onclick="save()" class="standard_link nav_link_first">Salva le modifiche</a>
-			|<a href="#" onclick="_close()" class="standard_link nav_link_last">Chiudi</a>
+			<a href="#" onclick="save()" class="standard_link">Salva le modifiche</a>
 		</div>
 	</div>
 	<p class="spacer"></p>

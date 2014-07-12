@@ -17,59 +17,68 @@
 	var win2;
 
 	var upd_cls = function(id){
-		if(!confirm("Sei sicuro di voler togliere l'alunno dalla classe?"))
+		if(!confirm("Sei sicuro di voler togliere l'alunno dalla classe?")){
 			return false;
+		}
 
-		var req = new Ajax.Request('upd_class.php',
-				  {
-				        method:'post',
-				        parameters: {std: id, cl: "0"},
-				        onSuccess: function(transport){
-				            var response = transport.responseText || "no response text";
-				            //alert(response);
-				            var dati = response.split("|");
-			                if(dati[0] == "ko"){
-								alert("Errore nella cancellazione dell'alunno dalla classe: "+dati[1]+"\n"+dati[2]);
-								return false;
-			                }
-			                $('tr'+dati[1]).style.display = "none";
-							upd_summary(<?php print $_REQUEST['id_classe'] ?>);
-				        },
-				        onFailure: function(){ alert("Si e' verificato un errore..."); }
-				  });
-
+		$.ajax({
+			type: "POST",
+			url: "upd_class.php",
+			data:  {std: id, cl: "0"},
+			dataType: 'json',
+			error: function(data, status, errore) {
+				alert("Si e' verificato un errore");
+				return false;
+			},
+			succes: function(result) {
+				alert("ok");
+			},
+			complete: function(data, status){
+				r = data.responseText;
+				var json = $.parseJSON(r);
+				if(json.status == "kosql"){
+					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+					return;
+				}
+				else {
+					$('#tr'+json.id).hide();
+					upd_summary(<?php print $_REQUEST['id_classe'] ?>);
+				}
+			}
+		});
 	};
 
 	var upd_summary = function(class_id){
-		var req = new Ajax.Request('get_class_summary.php',
-				  {
-				        method:'post',
-				        parameters: {cl: class_id},
-				        onSuccess: function(transport){
-				            var response = transport.responseText || "no response text";
-				            //alert(response);
-				            var dati = response.split(";");
-			                if(dati[0] == "ko"){
-								//alert("Errore nella cancellazione dell'alunno dalla classe: "+dati[1]+"\n"+dati[2]);
-								return false;
-			                }
-			                $('nmb_st').innerHTML = (parseInt(dati[1]) + parseInt(dati[2]));
-			                $('nmb_male').innerHTML = dati[1];
-			                $('nmb_female').innerHTML = dati[2];
-			                $('nmb_rip').innerHTML = dati[3];
-			                $('nmb_h').innerHTML = dati[4]+" / "+dati[5]+" ("+dati[6]+")";
-			                $('avg').innerHTML = dati[7];
-				        },
-				        onFailure: function(){ alert("Si e' verificato un errore..."); }
-				  });
-	};
-
-	var add_student = function(class_id){
-		win = new Window({className: "mac_os_x", url: "stud_filter.php", top:100, left:100,  width:400, zIndex: 100, resizable: true, title: "Selezione alunni", showEffect:Effect.Appear, hideEffect: Effect.Fade, draggable:true, wiredDrag: true});
-		win.show(false);
-
-		win2 = new Window({className: "mac_os_x", top:100, left: 510, width:400, zIndex: 100, resizable: true, title: "Elenco alunni", showEffect:Effect.Appear, hideEffect: Effect.Fade, draggable:true, wiredDrag: true});
-		win2.getContent().update("<div style='width:100%; font-weight: bold; text-align: center;' id='list_div'><p style='padding-top: 20px; font-weight: bold'>Elenco alunni estratti<a href='#' onclick='_close()' style='float: right; font-size: 12px; padding-right: 25px; font-weight: normal'>Chiudi</a></p></div>");
+		$.ajax({
+			type: "POST",
+			url: "get_class_summary.php",
+			data:  {cl: class_id},
+			dataType: 'json',
+			error: function(data, status, errore) {
+				alert("Si e' verificato un errore");
+				return false;
+			},
+			succes: function(result) {
+				alert("ok");
+			},
+			complete: function(data, status){
+				r = data.responseText;
+				var json = $.parseJSON(r);
+				if(json.status == "kosql"){
+					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+					return;
+				}
+				else {
+					data = json.data;
+					$('#nmb_st').text(data.male + data.female);
+					$('#nmb_male').text(data.male);
+					$('#nmb_female').text(data.female);
+					$('#nmb_rip').text(data.rip);
+					$('#nmb_h').text(data.h+" / "+(data.dsa + data.des)+"("+data.sos+")");
+					$('#avg').text(data.avg);
+				}
+			}
+		});
 	};
 
 	var update_class = function(id, cl){
@@ -90,13 +99,6 @@
 				        },
 				        onFailure: function(){ alert("Si e' verificato un errore..."); }
 				  });
-	};
-
-	var _close = function(){
-		document.location.href = "classe_prima.php?id_classe=<?php print $_REQUEST['id_classe'] ?>";
-		win2.close();
-		win.close();
-
 	};
 	</script>
 </head>
@@ -196,12 +198,12 @@
 	 	    <table style="border-collapse: collapse; width: 95%; margin: 30px auto 20px auto">
 	 	    	<thead>
 	 	    	<tr>
-	 	    		<td colspan="7" style="text-align: right; padding-right: 20px; height: 30px"><a href="classe_prima.php?id_classe=<?php print $_REQUEST['id_classe'] ?>" style="float: left">Ordina per cognome</a><span style="float: left">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="classe_prima.php?id_classe=<?php print $_REQUEST['id_classe'] ?>&order=from" style="float: left">Ordina per provenienza</a><a href="#" onclick="add_student(<?php print $_REQUEST['id_classe'] ?>)">Aggiungi alunno</a></td>
+	 	    		<td colspan="7" style="text-align: right; padding-right: 20px; height: 30px"><a href="classe_prima.php?id_classe=<?php print $_REQUEST['id_classe'] ?>" style="float: left">Ordina per cognome</a><span style="float: left">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="classe_prima.php?id_classe=<?php print $_REQUEST['id_classe'] ?>&order=from" style="float: left">Ordina per provenienza</a></td>
 	 	    	</tr>
 	 	    	<tr style="font-weight: bold; height: 30px">
 					<td style="width: 27%; border-bottom: 1px solid #cccccc">Cognome e nome</td>
 					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc">Ripetente</td>
-					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc">H / DSA</td>
+					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc">BES</td>
 					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc">Sesso</td>
 					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc">Voto</td>
 					<td style="width: 30%; text-align: center; border-bottom: 1px solid #cccccc">Note</td>

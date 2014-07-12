@@ -104,7 +104,7 @@
 						var lnk2 = document.createElement("a");
 						lnk2.setAttribute("href", "class_from.php?class_id="+max);
 						lnk2.setAttribute("style", "text-decoration: none; font-weight: bold;");
-						lnk2.appendChild(document.createTextNode("5"+_cls));
+						lnk2.appendChild(document.createTextNode(_cls));
 						$('#sp_'+school).append(lnk2);
 					}
 					else {
@@ -113,7 +113,7 @@
 							var lnk2 = document.createElement("a");
 							lnk2.setAttribute("href", "class_from.php?class_id="+start);
 							lnk2.setAttribute("style", "text-decoration: none; font-weight: bold; margin-left: 10px");
-							lnk2.appendChild(document.createTextNode("5"+_arr_cls[i]));
+							lnk2.appendChild(document.createTextNode(_arr_cls[i]));
 							$('#sp_'+school).append(lnk2);
 							start++;
 						}

@@ -4,9 +4,13 @@
 				<ul class="menublock" style="" dir="rtl">
 					<li><a href="index.php">Home</a></li>
 					<li><a href="schools.php">Scuole di provenienza</a></li>
-					<li><a href="insert_students.php">Inserimento</a></li>
-					<li><a href="students.php">Alunni</a></li>
 					<li><a href="classi.php">Classi prime</a></li>
-					<li><a href="nuove_classi.php">Altre classi</a></li>
+				</ul>
+				<p class="menu_label act_icon">Alunni</p>
+				<ul class="menublock" style="" dir="rtl">
+					<li><a href="insert_students.php">Inserimento</a></li>
+					<li><a href="students.php">Elenco </a></li>
+					<li><a href="import_students.php">Importazione</a></li>
+					<li><a href="ripetenti.php">Ripetenti</a></li>
 				</ul>
 			</div>
