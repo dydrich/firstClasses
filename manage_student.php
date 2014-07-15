@@ -111,6 +111,40 @@ switch($_REQUEST['action']){
 		echo json_encode($response);
 		exit;
 		break;
+	case 6:
+		// aggiunta preferenza
+		$id_alunno = $_REQUEST['id_alunno'];
+		$comp = $_REQUEST['pref'];
+		try{
+			$response['max'] = $db->executeUpdate("INSERT INTO rb_fc_preferenze_alunni (alunno, preferenza) VALUES ({$id_alunno}, {$comp})");
+			$response['name'] = $db->executeCount("SELECT CONCAT_WS(' ', cognome, nome) FROM rb_fc_alunni WHERE id_alunno = {$comp}");
+		} catch (MySQLException $ex){
+			$response['status'] = "kosql";
+			$response['message'] = $ex->getMessage();
+			$response['query'] = $ex->getQuery();
+			echo json_encode($response);
+			exit;
+		}
+		echo json_encode($response);
+		exit;
+		break;
+	case 7:
+		// cancellazione preferenza
+		$id_alunno = $_REQUEST['id_alunno'];
+		$comp = $_REQUEST['pref'];
+		try{
+			$db->executeUpdate("DELETE FROM rb_fc_preferenze_alunni WHERE alunno = {$id_alunno} AND preferenza = {$comp}");
+		} catch (MySQLException $ex){
+			$response['status'] = "kosql";
+			$response['message'] = $ex->getMessage();
+			$response['query'] = $ex->getQuery();
+			echo json_encode($response);
+			exit;
+		}
+		echo json_encode($response);
+		exit;
+		break;
+		break;
 }
 try{
 	$db->executeUpdate($query);
