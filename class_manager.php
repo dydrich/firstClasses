@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * modifica le classi in rb_fc_classi
+ * action = 1: inserisce nuova classe
+ * action = 2: cancella classe
+ * action = 3: associa le classi a quelle nell'archivio principale
+ */
+
 include "../../lib/start.php";
 
 check_session();
@@ -8,7 +15,9 @@ check_permission(DIR_PERM);
 header("Content-type: application/json");
 $response = array("status" => "ok", "message" => "Operazione completata");
 
-$id = $_REQUEST['id'];
+if (isset($_REQUEST['id'])){
+	$id = $_REQUEST['id'];
+}
 
 switch($_REQUEST['action']){
 	case "1":
@@ -25,6 +34,31 @@ switch($_REQUEST['action']){
 		$db->executeUpdate($upd);
 		$statement = "DELETE FROM rb_fc_classi WHERE id_classe = {$id}";
 		$error = "Errore nella cancellazione della classe";
+		break;
+	case "3":
+		try {
+			$arch_cls = $db->executeQuery("SELECT id_classe, sezione FROM rb_classi WHERE ordine_di_scuola = 1 AND anno_corso = 1 ORDER BY sezione");
+			if (count($arch_cls) < 1){
+				$response['message'] = "Le classi non sono ancora state inserite in archivio";
+				echo json_encode($response);
+				exit;
+			}
+			foreach ($arch_cls as $row){
+				$upd = "UPDATE rb_fc_classi SET classe_archivio = {$row['id_classe']} WHERE descrizione = '1{$row['sezione']}'";
+				$db->executeUpdate($upd);
+				//echo $upd;
+			}
+		} catch (MySQLException $ex){
+			$response['status'] = "kosql";
+			$response['message'] = $ex->getMessage();
+			$response['query'] = $ex->getQuery();
+			$response['error'] = $error;
+			echo json_encode($response);
+			exit;
+		}
+		$response['message'] = "Associazione completata";
+		echo json_encode($response);
+		exit;
 		break;
 }
 try{

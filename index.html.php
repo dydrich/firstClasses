@@ -1,20 +1,75 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-	<title><?php print $_SESSION['__config__']['intestazione_scuola'] ?>:: classi prime scuola secondaria</title>
-	<link rel="stylesheet" href="../../intranet/teachers/reg.css" type="text/css" media="screen,projection" />
-	<link rel="stylesheet" href="theme/style.css" type="text/css" media="screen,projection" />
-	<link rel="stylesheet" href="../../js/jquery_themes/custom-theme/jquery-ui-1.10.3.custom.min.css" type="text/css" media="screen,projection" />
-	<script type="text/javascript" src="../../js/jquery-2.0.3.min.js"></script>
-	<script type="text/javascript" src="../../js/jquery-ui-1.10.3.custom.min.js"></script>
-	<script type="text/javascript" src="../../js/jquery-ui-timepicker-addon.js"></script>
-	<script type="text/javascript" src="../../js/page.js"></script>
-	<script type="text/javascript">
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title><?php print $_SESSION['__config__']['intestazione_scuola'] ?>:: classi prime scuola secondaria</title>
+<link rel="stylesheet" href="../../intranet/teachers/reg.css" type="text/css" media="screen,projection" />
+<link rel="stylesheet" href="theme/style.css" type="text/css" media="screen,projection" />
+<link rel="stylesheet" href="../../js/jquery_themes/custom-theme/jquery-ui-1.10.3.custom.min.css" type="text/css" media="screen,projection" />
+<script type="text/javascript" src="../../js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="../../js/jquery-ui-1.10.3.custom.min.js"></script>
+<script type="text/javascript" src="../../js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="../../js/page.js"></script>
+<script type="text/javascript">
+	var associa = function(){
+		$.ajax({
+			type: "POST",
+			url: "class_manager.php",
+			data: {action: 3},
+			dataType: 'json',
+			error: function(data, status, errore) {
+				alert("Si e' verificato un errore");
+				return false;
+			},
+			succes: function(result) {
+				alert("ok");
+			},
+			complete: function(data, status){
+				r = data.responseText;
+				var json = $.parseJSON(r);
+				if(json.status == "kosql"){
+					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+					return;
+				}
+				else {
+					$('#not1').text(json.message);
+					$('#not1').show(1000);
+					window.setTimeout("$('#not1').hide(1000)", 2000);
+				}
+			}
+		});
+	};
 
+	var termina = function(){
+		$.ajax({
+			type: "POST",
+			url: "manage_student.php",
+			data: {action: 8},
+			dataType: 'json',
+			error: function(data, status, errore) {
+				alert("Si e' verificato un errore");
+				return false;
+			},
+			succes: function(result) {
+				alert("ok");
+			},
+			complete: function(data, status){
+				r = data.responseText;
+				var json = $.parseJSON(r);
+				if(json.status == "kosql"){
+					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+					return;
+				}
+				else {
+					$('#not1').text(json.message);
+					$('#not1').show(1000);
+					window.setTimeout("$('#not1').hide(1000)", 2000);
+				}
+			}
+		});
+	};
 
-
-	</script>
+</script>
 </head>
 <body>
 <?php include "../../intranet/{$_SESSION['__mod_area__']}/header.php" ?>
@@ -39,6 +94,7 @@
 					print "Hai inserito $n_cls classi";
 				}
 				?>
+				<p><a href="#" onclick="associa()">Associa le classi</a></p>
 			</p>
 		</div>
 		<div class="welcome">
@@ -51,6 +107,7 @@
 				print "Sono presenti $n_std alunni<br />$not_assigned alunni non sono ancora stati assegnati ad una classe";
 			}
 			?>
+				<p><a href="#" onclick="termina()">Importa i dati</a></p>
 			</p>
 		</div>
 	</div>

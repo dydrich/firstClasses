@@ -1,5 +1,17 @@
 <?php
 
+/*
+ * gestione studenti
+ * action = 1 - modifica studente
+ * action = 2 - inserimento studente
+ * action = 3 - cancellazione studente
+ * action = 4 - importazione alunni classi quinte
+ * action = 5 - importazione alunni ripetenti
+ * action = 6 - inserimento preferenze compagni
+ * action = 7 - cancellazione preferenze compagni
+ * action = 8 - inserimento dati nell'archivio principale
+ */
+
 include "../../lib/start.php";
 
 check_session();
@@ -144,6 +156,21 @@ switch($_REQUEST['action']){
 		echo json_encode($response);
 		exit;
 		break;
+	case 8:
+		/**
+		 * prima fase: inserimento nuovi alunni
+		 */
+		$new_students = $db->executeQuery("SELECT nome, cognome, sesso, classe_archivio FROM rb_fc_alunni, rb_fc_classi WHERE rb_fc_alunni.id_classe = rb_fc_classi.id_classe AND id_archivio IS NULL");
+		foreach ($new_students as $row) {
+			$db->executeUpdate("INSERT INTO rb_alunni (cognome, nome, sesso, attivo, ripetente, id_classe) VALUES ('{$row['cognome']}', '{$row['nome']}', '{$row['sesso']}', '1', 0, {$row['classe_archivio']})");
+			//echo "INSERT INTO rb_alunni (cognome, nome, sesso, attivo, ripetente, id_classe) VALUES ('{$row['cognome']}', '{$row['nome']}', '{$row['sesso']}', '1', 0, {$row['classe_archivio']})<br>";
+		}
+		/**
+		 * seconda fase: alunni classi quinte
+		 */
+		$db->executeUpdate("UPDATE rb_alunni, rb_fc_alunni, rb_fc_classi SET attivo = '1', rb_alunni.id_classe = classe_archivio WHERE rb_fc_alunni.id_archivio = rb_alunni.id_alunno AND rb_fc_alunni.id_classe = rb_fc_classi.id_classe  ");
+		echo json_encode($response);
+		exit;
 		break;
 }
 try{

@@ -79,7 +79,36 @@
 			}
 		});
 	};
-	</script>
+
+	var associa = function(){
+		$.ajax({
+			type: "POST",
+			url: "class_manager.php",
+			data: {action: 3},
+			dataType: 'json',
+			error: function(data, status, errore) {
+				alert("Si e' verificato un errore");
+				return false;
+			},
+			succes: function(result) {
+				alert("ok");
+			},
+			complete: function(data, status){
+				r = data.responseText;
+				var json = $.parseJSON(r);
+				if(json.status == "kosql"){
+					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+					return;
+				}
+				else {
+					$('#not1').text(json.message);
+					$('#not1').show(1000);
+					window.setTimeout("$('#not1').hide(1000)", 2000);
+				}
+			}
+		});
+	};
+</script>
 </head>
 <body>
 <?php include "../../intranet/{$_SESSION['__mod_area__']}/header.php" ?>
@@ -158,7 +187,8 @@
 	 	    	<tfoot>
 	 	   		<tr>
 	 				<td colspan="8" style="text-align: right; margin-right: 10px; padding-top: 30px">
-						<a href="#" class="standard_link" onclick="_classes()">Aggiungi classi</a>
+					    <a href="#" class="standard_link nav_link_first" onclick="associa()">Associa classi</a>|
+						<a href="#" class="standard_link nav_link_last" onclick="_classes()">Aggiungi classi</a>
 						<input type="hidden" name="cls" id="cls" /> 				
 	 				</td>    		
 	 	   		</tr>
