@@ -110,23 +110,23 @@
 		<?php include "menu.php" ?>
 	</div>
 	<div id="left_col">
-		<div style="width: 95%; height: 30px; margin: 10px auto 0 auto; text-align: center; font-size: 1.1em; text-transform: uppercase">
+		<div class="group_head">
 			Alunni classi prime (<?php echo $n_std ?> studenti)
 		</div>
 		<div id="not1" class="notification"></div>
 		<form id="my_form" style="border: 1px solid #666666; border-radius: 10px; margin-top: 20px; text-align: left; width: 90%; margin-left: auto; margin-right: auto" method="post">
 			<table style="border-collapse: collapse; width: 95%; margin: 30px auto 20px auto">
 				<thead>
-				<tr><td style="text-align: right; padding-bottom: 20px" colspan="9"><a href="insert_students.php" style="float: left">Aggiungi alunno</a><a href="students.php?q=assigned&order=<?php print $_REQUEST['order'] ?>">Solo alunni gi&agrave; assegnati</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="students.php?q=not_assigned&order=<?php echo $req_order ?>">Solo alunni non assegnati</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="students.php?order=<?php echo $req_order ?>">Tutti</a></td></tr>
+				<tr><td style="text-align: right; padding-bottom: 20px" colspan="9"><a href="insert_students.php" style="float: left">Aggiungi alunno</a><a href="students.php?q=assigned&order=<?php echo $req_order ?>">Solo alunni gi&agrave; assegnati</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="students.php?q=not_assigned&order=<?php echo $req_order ?>">Solo alunni non assegnati</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="students.php?order=<?php echo $req_order ?>">Tutti</a></td></tr>
 				<tr style="font-weight: bold; height: 30px">
 					<td style="width: 25%; border-bottom: 1px solid #cccccc"><a href="students.php?q=<?php echo $q ?>">Cognome e nome</a></td>
-					<td style="width: 5%; text-align: center; border-bottom: 1px solid #cccccc"><a href="students.php?order=rip&q=<?php print $_REQUEST['q'] ?>">Rip</a></td>
-					<td style="width: 5%; text-align: center; border-bottom: 1px solid #cccccc"><a href="students.php?order=h&q=<?php print $_REQUEST['q'] ?>">BES</a></td>
-					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc"><a href="students.php?order=sex&q=<?php print $_REQUEST['q'] ?>">Sesso</a></td>
-					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc"><a href="students.php?order=grade&q=<?php print $_REQUEST['q'] ?>">Voto</a></td>
-					<td style="width: 11%; text-align: center; border-bottom: 1px solid #cccccc"><a href="students.php?order=from&q=<?php print $_REQUEST['q'] ?>">Provenienza</a></td>
+					<td style="width: 5%; text-align: center; border-bottom: 1px solid #cccccc"><a href="students.php?order=rip&q=<?php echo $q ?>">Rip</a></td>
+					<td style="width: 5%; text-align: center; border-bottom: 1px solid #cccccc"><a href="students.php?order=h&q=<?php echo $q ?>">BES</a></td>
+					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc"><a href="students.php?order=sex&q=<?php echo $q ?>">Sesso</a></td>
+					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc"><a href="students.php?order=grade&q=<?php echo $q ?>">Voto</a></td>
+					<td style="width: 11%; text-align: center; border-bottom: 1px solid #cccccc"><a href="students.php?order=from&q=<?php echo $q ?>">Provenienza</a></td>
 					<td style="width: 20%; text-align: center; border-bottom: 1px solid #cccccc"><a href="#">Note</a></td>
-					<td style="width: 11%; text-align: center; border-bottom: 1px solid #cccccc"><a href="students.php?order=cls&q=<?php print $_REQUEST['q'] ?>">Classe</a></td>
+					<td style="width: 11%; text-align: center; border-bottom: 1px solid #cccccc"><a href="students.php?order=cls&q=<?php echo $q ?>">Classe</a></td>
 					<td style="width: 3%; text-align: center; border-bottom: 1px solid #cccccc"></td>
 				</tr>
 				</thead>
@@ -159,15 +159,15 @@
 	 	    		else if($dsa != "")
 	 	    			$sost = $dsa;
 	 	    ?>
-	 	    	<tr id="tr<?php print $st['id_alunno'] ?>" style="<?php if($st['id_classe'] != "") print("background-color: #".$classes_and_colors[$st['id_classe']]['color']) ?>">
-					<td style="width: 25%; border-bottom: 1px solid #cccccc;<?php print $bck ?>"><a href="#" onclick="_student(<?php print $st['id_alunno'] ?>)"><?php print $st['name'] ?></a></td>
-					<td style="width: 5%; text-align: center; border-bottom: 1px solid #cccccc;<?php print $bck ?>"><?php print $ripetente ?></td>
-					<td style="width: 5%; text-align: center; border-bottom: 1px solid #cccccc;<?php print $bck ?>"><?php print $sost ?></td>
-					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc;<?php print $bck ?>"><?php print $st['sesso'] ?></td>
-					<td style="width: 10%; text-align: center; border-bottom: 1px solid #cccccc;<?php print $bck ?>"><?php print $st['voto'] ?></td>
-					<td style="width: 11%; text-align: center; border-bottom: 1px solid #cccccc;<?php print $bck ?>"><?php print $st['class_from'] ?></td>
-					<td style="width: 20%; text-align: center; border-bottom: 1px solid #cccccc;<?php print $bck ?>"><?php print utf8_decode($st['note']) ?></td>
-					<td style="width: 11%; text-align: center; border-bottom: 1px solid #cccccc;<?php print $bck ?>">
+	 	    	<tr id="tr<?php print $st['id_alunno'] ?>" class="bottom_decoration" style="<?php if($st['id_classe'] != "") print("background-color: #".$classes_and_colors[$st['id_classe']]['color']) ?>">
+					<td style="width: 25%"><a href="#" onclick="_student(<?php print $st['id_alunno'] ?>)"><?php print $st['name'] ?></a></td>
+					<td style="width: 5%; text-align: center"><?php print $ripetente ?></td>
+					<td style="width: 5%; text-align: center"><?php print $sost ?></td>
+					<td style="width: 10%; text-align: center"><?php print $st['sesso'] ?></td>
+					<td style="width: 10%; text-align: center"><?php print $st['voto'] ?></td>
+					<td style="width: 11%; text-align: center"><?php print $st['class_from'] ?></td>
+					<td style="width: 20%; text-align: center"><?php print utf8_decode($st['note']) ?></td>
+					<td style="width: 11%; text-align: center">
 						<select id="n_class" name="n_class" class="form_input" style="width: 90%" onchange="update_class(<?php print $st['id_alunno'] ?>, this)">
 							<option value="0">.</option>
 							<?php 
@@ -177,7 +177,7 @@
 							<?php } ?>
 						</select>
 					</td>
-					<td style="width: 3%; font-weight: bold; text-align: center; border-bottom: 1px solid #cccccc;<?php print $bck ?>"><a style="color: red; font-weight: bold" href="#" onclick="del_std(<?php print $st['id_alunno'] ?>)">x</a></td>	 	    	
+					<td style="width: 3%; font-weight: bold; text-align: center"><a style="color: red; font-weight: bold" href="#" onclick="del_std(<?php print $st['id_alunno'] ?>)">x</a></td>
 	 	    	</tr>
 	 	    	<?php } ?>
 

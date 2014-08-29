@@ -118,7 +118,7 @@
 		<?php include "menu.php" ?>
 	</div>
 	<div id="left_col">
-		<div style="width: 95%; height: 30px; margin: 10px auto 0 auto; text-align: center; font-size: 1.1em; text-transform: uppercase">
+		<div class="group_head">
 			Classi prime
 		</div>
 		<div id="not1" class="notification"></div>

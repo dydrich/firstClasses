@@ -60,7 +60,7 @@
 		<?php include "menu.php" ?>
 	</div>
 	<div id="left_col">
-		<div style="width: 95%; height: 30px; margin: 10px auto 0 auto; text-align: center; font-size: 1.1em; text-transform: uppercase">
+		<div class="group_head">
 			Alunni classi quinte
 		</div>
 		<div id="not1" class="notification"></div>
@@ -84,11 +84,11 @@
 				<?php
 					foreach ($class['alunni'] as $id => $alunno){
 				?>
-					<tr>
-						<td style="width: 40%; border-bottom: 1px solid rgba(211, 222, 199, 0.6);"><?php echo $alunno['cognome'] ?></td>
-						<td style="width: 40%; border-bottom: 1px solid rgba(211, 222, 199, 0.6);"><?php echo $alunno['nome'] ?></td>
-						<td style="width: 10%; text-align: center; border-bottom: 1px solid rgba(211, 222, 199, 0.6);"><?php echo $alunno['voto'] ?></td>
-						<td style="width: 10%; text-align: center; border-bottom: 1px solid rgba(211, 222, 199, 0.6);">
+					<tr class="bottom_decoration">
+						<td style="width: 40%"><?php echo $alunno['cognome'] ?></td>
+						<td style="width: 40%"><?php echo $alunno['nome'] ?></td>
+						<td style="width: 10%; text-align: center"><?php echo $alunno['voto'] ?></td>
+						<td style="width: 10%; text-align: center">
 							<input type="checkbox" name="sts[]" id="st_<?php echo $id ?>" class="ck<?php echo $idc ?>" value="<?php echo $id ?>" />
 						</td>
 					</tr>
