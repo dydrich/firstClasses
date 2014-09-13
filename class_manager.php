@@ -48,6 +48,21 @@ switch($_REQUEST['action']){
 				$db->executeUpdate($upd);
 				//echo $upd;
 			}
+			/*
+			 * associazione alunni
+			 */
+			$sel_fc_cls = "SELECT id_classe, classe_archivio FROM rb_fc_classi";
+			$res_fc_cls = $db->executeQuery($sel_fc_cls);
+			$fc_cls = array();
+			while ($r = $res_fc_cls->fetch_assoc()) {
+				$fc_cls[$r['id_classe']] = $r['classe_archivio'];
+			}
+
+			$res_fc_alunni = $db->executeQuery("SELECT id_classe, id_archivio FROM rb_fc_alunni");
+			while ($row = $res_fc_alunni->fetch_assoc()) {
+				$new_cls = $fc_cls[$row['id_classe']];
+				$db->executeUpdate("UPDATE rb_alunni SET id_classe = ".$new_cls." WHERE id_alunno = ".$row['id_archivio']);
+			}
 		} catch (MySQLException $ex){
 			$response['status'] = "kosql";
 			$response['message'] = $ex->getMessage();
