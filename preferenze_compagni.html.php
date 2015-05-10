@@ -7,12 +7,13 @@
 	<link rel="stylesheet" href="../../css/general.css" type="text/css" media="screen,projection" />
 	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/jquery-ui.min.css" type="text/css" media="screen,projection" /><script type="text/javascript" src="../../js/jquery-2.0.3.min.js"></script>
 	<script type="text/javascript" src="../../js/jquery-ui-1.10.3.custom.min.js"></script>
-	<script type="text/javascript" src="../../js/jquery-ui-timepicker-addon.js"></script>
 	<script type="text/javascript" src="../../js/page.js"></script>
 	<script type="text/javascript">
 		var id_alunno = 0;
 
 		$(function(){
+			load_jalert();
+			setOverlayEvent();
 			$('.show_list').click(function(event){
 				event.preventDefault();
 				strs = this.id.split('_');
@@ -56,14 +57,13 @@
 		}
 
 		var save_pref = function(id_pref, action){
-			alert (action);
 			$.ajax({
 				type: "POST",
 				url: "manage_student.php",
 				data:  {id_alunno: id_alunno, pref: id_pref, action: action},
 				dataType: 'json',
 				error: function(data, status, errore) {
-					alert("Si e' verificato un errore");
+					j_alert("error", "Si e' verificato un errore");
 					return false;
 				},
 				succes: function(result) {
@@ -73,7 +73,7 @@
 					r = data.responseText;
 					var json = $.parseJSON(r);
 					if(json.status == "kosql"){
-						alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+						j_alert("error", "Errore SQL");
 						return;
 					}
 					else {
@@ -106,10 +106,6 @@
 		<?php include "menu.php" ?>
 	</div>
 	<div id="left_col">
-		<div class="group_head">
-			Preferenze compagni
-		</div>
-		<div id="not1" class="notification"></div>
 		<form id="my_form" style="border: 1px solid #aaaaaa; border-radius: 10px; margin-top: 20px; text-align: left; width: 90%; margin-left: auto; margin-right: auto" method="post">
 			<table style="border-collapse: collapse; width: 90%; margin: 10px auto 20px auto">
 				<tr style="font-weight: bold; height: 30px">
@@ -157,7 +153,7 @@
 reset($students);
 foreach ($students as $id => $alunno){
 	?>
-	<p style="line-height: 10px; heigh: 10px; font-size: 10px">
+	<p style="line-height: 10px; height: 10px; font-size: 11px">
 		<a href="#" class="sprefs" id="pref_<?php echo $id ?>"><?php echo $alunno['cognome']." ".$alunno['nome'] ?></a>
 	</p>
 <?php
@@ -165,5 +161,20 @@ foreach ($students as $id => $alunno){
 ?>
 </div>
 <?php include "../../intranet/{$_SESSION['__mod_area__']}/footer.php" ?>
+<div id="drawer" class="drawer" style="display: none; position: absolute">
+	<div style="width: 100%; height: 430px">
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/index.php"><img src="../../images/6.png" style="margin-right: 10px; position: relative; top: 5%" />Home</a></div>
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/profile.php"><img src="../../images/33.png" style="margin-right: 10px; position: relative; top: 5%" />Profilo</a></div>
+		<div class="drawer_link"><a href="../../modules/documents/load_module.php?module=docs&area=<?php echo $_SESSION['__area__'] ?>"><img src="../../images/11.png" style="margin-right: 10px; position: relative; top: 5%" />Documenti</a></div>
+		<?php if(is_installed("com")){ ?>
+			<div class="drawer_link"><a href="<?php echo $_SESSION['__path_to_root__'] ?>modules/communication/load_module.php?module=com&area=<?php echo $_SESSION['__area__'] ?>"><img src="../../images/57.png" style="margin-right: 10px; position: relative; top: 5%" />Comunicazioni</a></div>
+		<?php } ?>
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/utility.php"><img src="../../images/59.png" style="margin-right: 10px; position: relative; top: 5%" />Utility</a></div>
+	</div>
+	<?php if (isset($_SESSION['__sudoer__'])): ?>
+		<div class="drawer_lastlink"><a href="<?php echo $_SESSION['__path_to_root__'] ?>admin/sudo_manager.php?action=back"><img src="../../images/14.png" style="margin-right: 10px; position: relative; top: 5%" />DeSuDo</a></div>
+	<?php endif; ?>
+	<div class="drawer_lastlink"><a href="../../shared/do_logout.php"><img src="../../images/51.png" style="margin-right: 10px; position: relative; top: 5%" />Logout</a></div>
+</div>
 </body>
 </html>

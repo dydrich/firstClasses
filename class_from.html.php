@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-	<title><?php print $_SESSION['__config__']['intestazione_scuola'] ?>:: classi prime scuola secondaria</title>
+	<title><?php print $_SESSION['__config__']['intestazione_scuola'] ?>:: classi prime</title>
 	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/reg.css" type="text/css" media="screen,projection" />
 	<link rel="stylesheet" href="../../css/general.css" type="text/css" media="screen,projection" />
 	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/jquery-ui.min.css" type="text/css" media="screen,projection" /><script type="text/javascript" src="../../js/jquery-2.0.3.min.js"></script>
@@ -10,85 +10,90 @@
 	<script type="text/javascript" src="../../js/jquery-ui-timepicker-addon.js"></script>
 	<script type="text/javascript" src="../../js/page.js"></script>
 	<script type="text/javascript">
-	var cls_desc;
-	var upd_grade = function(sel, stid){
-		var grade = sel.value;
-
-		$.ajax({
-			type: "POST",
-			url: "upd_grade.php",
-			data: {stid: stid, grade: grade, cl: <?php print $_REQUEST['class_id'] ?>},
-			dataType: 'json',
-			error: function(data, status, errore) {
-				alert("Si e' verificato un errore");
-				return false;
-			},
-			succes: function(result) {
-				alert("ok");
-			},
-			complete: function(data, status){
-				r = data.responseText;
-				var json = $.parseJSON(r);
-				if(json.status == "kosql"){
-					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
-					return;
-				}
-				else {
-					$('#avg').text(json.avg);
-				}
-			}
+		$(function(){
+			load_jalert();
+			setOverlayEvent();
 		});
-	};
 
-	var mod_class = function(){
-		var new_desc = prompt("Inserisci il nome della classe");
-		if (new_desc == "" || new_desc == null){
-			return false;
-		}
-		cls_desc = new_desc;
-		_upd_class(1);
-	};
+		var cls_desc;
+		var upd_grade = function(sel, stid){
+			var grade = sel.value;
 
-	var _upd_class = function(action){
-		if(action == 3){
-			if(!confirm("Sei sicuro di voler cancellare la classe? Dovrai poi assegnare gli studenti ad un'altra classe."))
-				return false;
-		}
-
-		var cl = <?php print(isset($_REQUEST['class_id']) ? $_REQUEST['class_id'] : 0) ?>;
-		$.ajax({
-			type: "POST",
-			url: "manage_classes_from.php",
-			data: {action: action, class_id: cl, class_name: cls_desc},
-			dataType: 'json',
-			error: function(data, status, errore) {
-				alert("Si e' verificato un errore");
-				return false;
-			},
-			succes: function(result) {
-				alert("ok");
-			},
-			complete: function(data, status){
-				r = data.responseText;
-				var json = $.parseJSON(r);
-				if(json.status == "kosql"){
-					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
-					return;
-				}
-				else {
-					$('#not1').text(json.message);
-					$('#not1').show(1000);
-					window.setTimeout("$('#not1').hide(1000)", 2000);
-					if(action == 1){
-						$('#cls_d').text(cls_desc);
+			$.ajax({
+				type: "POST",
+				url: "upd_grade.php",
+				data: {stid: stid, grade: grade, cl: <?php print $_REQUEST['class_id'] ?>},
+				dataType: 'json',
+				error: function(data, status, errore) {
+					j_alert("error", "Si e' verificato un errore");
+					return false;
+				},
+				succes: function(result) {
+					alert("ok");
+				},
+				complete: function(data, status){
+					r = data.responseText;
+					var json = $.parseJSON(r);
+					if(json.status == "kosql"){
+						j_alert("error", "Errore SQL");
+						return;
 					}
-					else if(action == 3){
-						document.location.href = "schools.php";
+					else {
+						$('#avg').text(json.avg);
 					}
 				}
+			});
+		};
+
+		var mod_class = function(){
+			var new_desc = prompt("Inserisci il nome della classe");
+			if (new_desc == "" || new_desc == null){
+				return false;
 			}
-		});
-	};
+			cls_desc = new_desc;
+			_upd_class(1);
+		};
+
+		var _upd_class = function(action){
+			if(action == 3){
+				if(!confirm("Sei sicuro di voler cancellare la classe? Dovrai poi assegnare gli studenti ad un'altra classe."))
+					return false;
+			}
+
+			var cl = <?php print(isset($_REQUEST['class_id']) ? $_REQUEST['class_id'] : 0) ?>;
+			$.ajax({
+				type: "POST",
+				url: "manage_classes_from.php",
+				data: {action: action, class_id: cl, class_name: cls_desc},
+				dataType: 'json',
+				error: function(data, status, errore) {
+					j_alert("error", "Si e' verificato un errore");
+					return false;
+				},
+				succes: function(result) {
+					alert("ok");
+				},
+				complete: function(data, status){
+					r = data.responseText;
+					var json = $.parseJSON(r);
+					if(json.status == "kosql"){
+						j_alert("error", "Errore SQL");
+						return;
+					}
+					else {
+						j_alert("alert", json.message);
+						if(action == 1){
+							$('#cls_d').text(cls_desc);
+						}
+						else if(action == 3){
+							setTimeout(function(){
+								document.location.href = "schools.php";
+							}, 2000);
+						}
+					}
+				}
+			});
+		};
 	</script>
 <body>
 <?php include "../../intranet/{$_SESSION['__mod_area__']}/header.php" ?>
@@ -234,13 +239,28 @@
 	 	    </table>
 			<!-- END CONTENT -->
 			</form>
-		<div style="width: 90%; text-align: right; margin-top: 20px">
-			<a href="#" onclick="mod_class()" class="standard_link nav_link_first">Modifica classe</a>
-			|<a href="#" onclick="_upd_class(3)" class="standard_link nav_link_last">Cancella classe</a>
+		<div style="width: 95%; text-align: right; margin-top: 20px">
+			<a href="#" onclick="mod_class()" class="material_link nav_link_first">Modifica classe</a>
+			<a href="#" onclick="_upd_class(3)" class="material_link nav_link_last">Cancella classe</a>
 		</div>
 	</div>
 	<p class="spacer"></p>
 </div>
 <?php include "../../intranet/{$_SESSION['__mod_area__']}/footer.php" ?>
+<div id="drawer" class="drawer" style="display: none; position: absolute">
+	<div style="width: 100%; height: 430px">
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/index.php"><img src="../../images/6.png" style="margin-right: 10px; position: relative; top: 5%" />Home</a></div>
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/profile.php"><img src="../../images/33.png" style="margin-right: 10px; position: relative; top: 5%" />Profilo</a></div>
+		<div class="drawer_link"><a href="../../modules/documents/load_module.php?module=docs&area=<?php echo $_SESSION['__area__'] ?>"><img src="../../images/11.png" style="margin-right: 10px; position: relative; top: 5%" />Documenti</a></div>
+		<?php if(is_installed("com")){ ?>
+			<div class="drawer_link"><a href="<?php echo $_SESSION['__path_to_root__'] ?>modules/communication/load_module.php?module=com&area=<?php echo $_SESSION['__area__'] ?>"><img src="../../images/57.png" style="margin-right: 10px; position: relative; top: 5%" />Comunicazioni</a></div>
+		<?php } ?>
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/utility.php"><img src="../../images/59.png" style="margin-right: 10px; position: relative; top: 5%" />Utility</a></div>
+	</div>
+	<?php if (isset($_SESSION['__sudoer__'])): ?>
+		<div class="drawer_lastlink"><a href="<?php echo $_SESSION['__path_to_root__'] ?>admin/sudo_manager.php?action=back"><img src="../../images/14.png" style="margin-right: 10px; position: relative; top: 5%" />DeSuDo</a></div>
+	<?php endif; ?>
+	<div class="drawer_lastlink"><a href="../../shared/do_logout.php"><img src="../../images/51.png" style="margin-right: 10px; position: relative; top: 5%" />Logout</a></div>
+</div>
 </body>
 </html>

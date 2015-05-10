@@ -2,102 +2,83 @@
 <html>
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-	<title><?php print $_SESSION['__config__']['intestazione_scuola'] ?>:: classi prime scuola secondaria</title>
+	<title><?php print $_SESSION['__config__']['intestazione_scuola'] ?>:: classi prime</title>
 	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/reg.css" type="text/css" media="screen,projection" />
 	<link rel="stylesheet" href="../../css/general.css" type="text/css" media="screen,projection" />
 	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/jquery-ui.min.css" type="text/css" media="screen,projection" /><script type="text/javascript" src="../../js/jquery-2.0.3.min.js"></script>
 	<script type="text/javascript" src="../../js/jquery-ui-1.10.3.custom.min.js"></script>
-	<script type="text/javascript" src="../../js/jquery-ui-timepicker-addon.js"></script>
 	<script type="text/javascript" src="../../js/page.js"></script>
 	<script type="text/javascript">
-	var students = <?php print $res_students->num_rows ?>;
-	var win;
-	var win2;
-
-	var upd_cls = function(id){
-		if(!confirm("Sei sicuro di voler togliere l'alunno dalla classe?")){
-			return false;
-		}
-
-		$.ajax({
-			type: "POST",
-			url: "upd_class.php",
-			data:  {std: id, cl: "0"},
-			dataType: 'json',
-			error: function(data, status, errore) {
-				alert("Si e' verificato un errore");
-				return false;
-			},
-			succes: function(result) {
-				alert("ok");
-			},
-			complete: function(data, status){
-				r = data.responseText;
-				var json = $.parseJSON(r);
-				if(json.status == "kosql"){
-					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
-					return;
-				}
-				else {
-					$('#tr'+json.id).hide();
-					upd_summary(<?php print $_REQUEST['id_classe'] ?>);
-				}
-			}
+		var students = <?php print $res_students->num_rows ?>;
+		$(function(){
+			load_jalert();
+			setOverlayEvent();
 		});
-	};
 
-	var upd_summary = function(class_id){
-		$.ajax({
-			type: "POST",
-			url: "get_class_summary.php",
-			data:  {cl: class_id},
-			dataType: 'json',
-			error: function(data, status, errore) {
-				alert("Si e' verificato un errore");
+		var upd_cls = function(id){
+			if(!confirm("Sei sicuro di voler togliere l'alunno dalla classe?")){
 				return false;
-			},
-			succes: function(result) {
-				alert("ok");
-			},
-			complete: function(data, status){
-				r = data.responseText;
-				var json = $.parseJSON(r);
-				if(json.status == "kosql"){
-					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
-					return;
-				}
-				else {
-					data = json.data;
-					$('#nmb_st').text(data.male + data.female);
-					$('#nmb_male').text(data.male);
-					$('#nmb_female').text(data.female);
-					$('#nmb_rip').text(data.rip);
-					$('#nmb_h').text(data.h+" / "+(data.dsa + data.des)+"("+data.sos+")");
-					$('#avg').text(data.avg);
-				}
 			}
-		});
-	};
 
-	var update_class = function(id, cl){
-		var req = new Ajax.Request('upd_class.php',
-				  {
-				        method:'post',
-				        parameters: {std: id, cl: cl},
-				        onSuccess: function(transport){
-				            var response = transport.responseText || "no response text";
-				            //alert(response);
-				            var dati = response.split("|");
-			                if(dati[0] == "ko"){
-								alert("Errore nell'aggiornamento della classe: "+dati[1]);
-								return false;
-			                }
-			                $('p'+id).style.display = "none";
+			$.ajax({
+				type: "POST",
+				url: "upd_class.php",
+				data:  {std: id, cl: "0"},
+				dataType: 'json',
+				error: function(data, status, errore) {
+					j_alert("error", "Si e' verificato un errore");
+					return false;
+				},
+				succes: function(result) {
+					alert("ok");
+				},
+				complete: function(data, status){
+					r = data.responseText;
+					var json = $.parseJSON(r);
+					if(json.status == "kosql"){
+						j_alert("error", "Si e' verificato un errore");
+						return;
+					}
+					else {
+						$('#tr'+json.id).hide();
+						upd_summary(<?php print $_REQUEST['id_classe'] ?>);
+					}
+				}
+			});
+		};
 
-				        },
-				        onFailure: function(){ alert("Si e' verificato un errore..."); }
-				  });
-	};
+		var upd_summary = function(class_id){
+			$.ajax({
+				type: "POST",
+				url: "get_class_summary.php",
+				data:  {cl: class_id},
+				dataType: 'json',
+				error: function(data, status, errore) {
+					j_alert("error", "Si e' verificato un errore");
+					return false;
+				},
+				succes: function(result) {
+					alert("ok");
+				},
+				complete: function(data, status){
+					r = data.responseText;
+					var json = $.parseJSON(r);
+					if(json.status == "kosql"){
+						j_alert("error", "Errore SQL");
+						return;
+					}
+					else {
+						data = json.data;
+						$('#nmb_st').text(data.male + data.female);
+						$('#nmb_male').text(data.male);
+						$('#nmb_female').text(data.female);
+						$('#nmb_rip').text(data.rip);
+						$('#nmb_h').text(data.h+" / "+(data.dsa + data.des)+"("+data.sos+")");
+						$('#avg').text(data.avg);
+					}
+				}
+			});
+		};
 	</script>
 </head>
 <body>
@@ -109,29 +90,29 @@
 	</div>
 	<div id="left_col">
 		<div style="width: 90%; height: 30px; margin: 10px auto 0 auto; text-align: center; font-size: 1.1em; text-transform: uppercase">
-			<span style="border-bottom: 1px solid; float: right; font-weight: bold; font-size: 12px">Media generale: <?php print $mv ?></span>
+			<span style="border-bottom: 1px solid; float: right; font-weight: bold; font-size: 12px" class="material_label">Media generale: <?php print $mv ?></span>
 		</div>
-		<form id="my_form" style="margin-top: 20px; text-align: left; width: 90%; margin-left: auto; margin-right: auto" method="post">
+		<form id="my_form" style="margin-top: 5px; text-align: left; width: 90%; margin-left: auto; margin-right: auto" method="post">
 	 	    <table style="border-collapse: collapse; width: 90%; margin: 0 auto 10px auto">
 	 	    <thead>
 	 	    	<tr>
 	 	    		<td colspan="6" style="text-align: center; font-weight: bold; border: 0; height: 30px">Riepilogo</td>
 	 	    	</tr>
 	 	    	<tr style="font-weight: bold">
-					<td style="width: 16%; border-top: 1px solid #cccccc; border-left: 1px solid #cccccc">Alunni: </td>
+					<td style="width: 16%; border-top: 1px solid #cccccc">Alunni: </td>
 					<td id="nmb_st" style="width: 16%; border-top: 1px solid #cccccc"><?php print $n_std ?></td>
 					<td style="width: 16%; border-top: 1px solid #cccccc">Maschi: </td>
 					<td id="nmb_male" style="width: 16%; border-top: 1px solid #cccccc"><?php print $male ?></td>
 					<td style="width: 16%; border-top: 1px solid #cccccc">H/DSA: </td>
-					<td id="nmb_h" style="width: 16%; border-top: 1px solid #cccccc; border-right: 1px solid #cccccc"><?php print ($h." / ".$dsa." (".($res_h->num_rows).")") ?></td>
+					<td id="nmb_h" style="width: 16%; border-top: 1px solid #cccccc"><?php print ($h." / ".$dsa." (".($res_h->num_rows).")") ?></td>
 	 	    	</tr>
 	 	    	<tr style="font-weight: bold">
-					<td style="width: 16%; border-bottom: 1px solid #cccccc; border-left: 1px solid #cccccc">Ripetenti: </td>
+					<td style="width: 16%; border-bottom: 1px solid #cccccc">Ripetenti: </td>
 					<td id="nmb_rip" style="width: 16%; border-bottom: 1px solid #cccccc"><?php print $ripetenti ?></td>
 					<td style="width: 16%; border-bottom: 1px solid #cccccc">Femmine: </td>
 					<td id="nmb_female" style="width: 16%; border-bottom: 1px solid #cccccc"><?php print $female ?></td>
 					<td style="width: 16%; border-bottom: 1px solid #cccccc">Media: </td>
-					<td id="avg" style="width: 16%; border-bottom: 1px solid #cccccc; border-right: 1px solid #cccccc"><?php print $avg ?></td>
+					<td id="avg" style="width: 16%; border-bottom: 1px solid #cccccc"><?php print $avg ?></td>
 	 	    	</tr>
 		        <tr>
 			        <td colspan="6" style="text-align: center; font-weight: bold; border: 0; padding-top: 20px; height: 30px">Classi di provenienza</td>
@@ -250,5 +231,20 @@
 	<p class="spacer"></p>
 </div>
 <?php include "../../intranet/{$_SESSION['__mod_area__']}/footer.php" ?>
+<div id="drawer" class="drawer" style="display: none; position: absolute">
+	<div style="width: 100%; height: 430px">
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/index.php"><img src="../../images/6.png" style="margin-right: 10px; position: relative; top: 5%" />Home</a></div>
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/profile.php"><img src="../../images/33.png" style="margin-right: 10px; position: relative; top: 5%" />Profilo</a></div>
+		<div class="drawer_link"><a href="../../modules/documents/load_module.php?module=docs&area=<?php echo $_SESSION['__area__'] ?>"><img src="../../images/11.png" style="margin-right: 10px; position: relative; top: 5%" />Documenti</a></div>
+		<?php if(is_installed("com")){ ?>
+			<div class="drawer_link"><a href="<?php echo $_SESSION['__path_to_root__'] ?>modules/communication/load_module.php?module=com&area=<?php echo $_SESSION['__area__'] ?>"><img src="../../images/57.png" style="margin-right: 10px; position: relative; top: 5%" />Comunicazioni</a></div>
+		<?php } ?>
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/utility.php"><img src="../../images/59.png" style="margin-right: 10px; position: relative; top: 5%" />Utility</a></div>
+	</div>
+	<?php if (isset($_SESSION['__sudoer__'])): ?>
+		<div class="drawer_lastlink"><a href="<?php echo $_SESSION['__path_to_root__'] ?>admin/sudo_manager.php?action=back"><img src="../../images/14.png" style="margin-right: 10px; position: relative; top: 5%" />DeSuDo</a></div>
+	<?php endif; ?>
+	<div class="drawer_lastlink"><a href="../../shared/do_logout.php"><img src="../../images/51.png" style="margin-right: 10px; position: relative; top: 5%" />Logout</a></div>
+</div>
 </body>
 </html>

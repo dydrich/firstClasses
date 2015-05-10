@@ -13,7 +13,7 @@ check_permission(DIR_PERM);
 
 $year = $_SESSION['__current_year__']->get_ID();
 
-$sel_students = "SELECT id_alunno, cognome, nome FROM rb_fc_alunni ORDER BY cognome, nome";
+$sel_students = "SELECT id_alunno, cognome, nome FROM rb_fc_alunni WHERE ordine_di_scuola = {$_SESSION['__school_order__']} ORDER BY cognome, nome";
 //echo $sel_students;
 $res_students = $db->executeQuery($sel_students);
 $students = array();
@@ -27,5 +27,13 @@ while ($st = $res_students->fetch_assoc()){
 		$students[$st['id_alunno']]['preferenze'][$row['id_alunno']] = $row['cognome']." ".$row['nome'];
 	}
 }
+$navigation_label = "";
+if ($_SESSION['__school_order__'] ==1) {
+	$navigation_label = "scuola secondaria";
+}
+else {
+	$navigation_label = "scuola primaria";
+}
+$drawer_label = "Preferenze compagni";
 
 include "preferenze_compagni.html.php";

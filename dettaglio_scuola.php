@@ -23,7 +23,13 @@ else {
 	$action = 2;
 }
 
-$navigation_label = "registro elettronico ";
+$navigation_label = "";
+if ($_SESSION['__school_order__'] ==1) {
+	$navigation_label = "scuola secondaria";
+}
+else {
+	$navigation_label = "scuola primaria";
+}
 $drawer_label = "Scuola di provenienza";
 
 include "dettaglio_scuola.html.php";

@@ -2,57 +2,62 @@
 <html>
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-	<title><?php print $_SESSION['__config__']['intestazione_scuola'] ?>:: classi prime scuola secondaria</title>
+	<title><?php print $_SESSION['__config__']['intestazione_scuola'] ?>:: classi prime</title>
 	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/reg.css" type="text/css" media="screen,projection" />
 	<link rel="stylesheet" href="../../css/general.css" type="text/css" media="screen,projection" />
 	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/jquery-ui.min.css" type="text/css" media="screen,projection" /><script type="text/javascript" src="../../js/jquery-2.0.3.min.js"></script>
 	<script type="text/javascript" src="../../js/jquery-ui-1.10.3.custom.min.js"></script>
-	<script type="text/javascript" src="../../js/jquery-ui-timepicker-addon.js"></script>
 	<script type="text/javascript" src="../../js/page.js"></script>
 	<script type="text/javascript">
-	var save = function(_continue){
-		$.ajax({
-			type: "POST",
-			url: "manage_student.php?action=2",
-			data: $('#my_form').serialize(true),
-			dataType: 'json',
-			error: function(data, status, errore) {
-				alert("Si e' verificato un errore");
-				return false;
-			},
-			succes: function(result) {
-				alert("ok");
-			},
-			complete: function(data, status){
-				r = data.responseText;
-				var json = $.parseJSON(r);
-				if(json.status == "kosql"){
-					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
-					return;
-				}
-				else {
-					$('#not1').text(json.message);
-					$('#not1').show(1000);
-					window.setTimeout("$('#not1').hide(1000)", 2000);
-					if(!_continue)
-						document.location.href = "students.php";
-					else{
-						$('#fname').text("");
-						$('#lname').text("");
-						$('#from').selectedIndex = 0;
-						$('#sex').selectedIndex = 0;
-						$('#h').selectedIndex = 0;
-						$('#diagnose').text("");
-						$('#tr_diag').style.display = "none";
-						$('#grade').selectedIndex = 0;
-						$('#note').text("");
-						$('#note').val("");
-						$('#fname').focus();
+		$(function(){
+			load_jalert();
+			setOverlayEvent();
+		});
+
+		var save = function(_continue){
+			$.ajax({
+				type: "POST",
+				url: "manage_student.php?action=2",
+				data: $('#my_form').serialize(true),
+				dataType: 'json',
+				error: function(data, status, errore) {
+					j_alert("error", "Si e' verificato un errore");
+					return false;
+				},
+				succes: function(result) {
+					alert("ok");
+				},
+				complete: function(data, status){
+					r = data.responseText;
+					var json = $.parseJSON(r);
+					if(json.status == "kosql"){
+						j_alert("error", "Errore SQL");
+						return;
+					}
+					else {
+						j_alert("alert", json.message);
+						if(!_continue) {
+							setTimeout(function() {
+								document.location.href = "students.php";
+							}, 2000);
+						}
+						else{
+							$('#fname').text("");
+							$('#lname').text("");
+							$('#from').selectedIndex = 0;
+							$('#sex').selectedIndex = 0;
+							$('#h').selectedIndex = 0;
+							$('#diagnose').text("");
+							$('#tr_diag').style.display = "none";
+							$('#grade').selectedIndex = 0;
+							$('#note').text("");
+							$('#note').val("");
+							$('#fname').focus();
+						}
 					}
 				}
-			}
-		});
-	};
+			});
+		};
 	</script>
 </head>
 <body onload="$('fname').focus()">
@@ -63,10 +68,6 @@
 		<?php include "menu.php" ?>
 	</div>
 	<div id="left_col">
-		<div class="group_head">
-			Inserimento studenti
-		</div>
-		<div id="not1" class="notification"></div>
 		<form id="my_form" style="border: 1px solid #666666; border-radius: 10px; margin-top: 20px; text-align: left; width: 80%; margin-left: auto; margin-right: auto">
 		<table style="width: 85%; border: 0; margin: 20px auto 20px auto">
 		<thead>
@@ -149,12 +150,27 @@
 		</table>
 		</form>
         <div style="width: 90%; text-align: right; margin-top: 20px">
-	        <a href="#" class="standard_link nav_link_first" onclick="save(false)">Salva ed esci</a>
-	        |<a href="#" class="standard_link nav_link_last" onclick="save(true)">Salva e continua</a>
+	        <a href="#" class="material_link nav_link_first" onclick="save(false)">Salva ed esci</a>
+	        <a href="#" class="material_link nav_link_last" onclick="save(true)">Salva e continua</a>
         </div>
 	</div>
 	<p class="spacer"></p>
 </div>
 <?php include "../../intranet/{$_SESSION['__mod_area__']}/footer.php" ?>
+<div id="drawer" class="drawer" style="display: none; position: absolute">
+	<div style="width: 100%; height: 430px">
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/index.php"><img src="../../images/6.png" style="margin-right: 10px; position: relative; top: 5%" />Home</a></div>
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/profile.php"><img src="../../images/33.png" style="margin-right: 10px; position: relative; top: 5%" />Profilo</a></div>
+		<div class="drawer_link"><a href="../../modules/documents/load_module.php?module=docs&area=<?php echo $_SESSION['__area__'] ?>"><img src="../../images/11.png" style="margin-right: 10px; position: relative; top: 5%" />Documenti</a></div>
+		<?php if(is_installed("com")){ ?>
+			<div class="drawer_link"><a href="<?php echo $_SESSION['__path_to_root__'] ?>modules/communication/load_module.php?module=com&area=<?php echo $_SESSION['__area__'] ?>"><img src="../../images/57.png" style="margin-right: 10px; position: relative; top: 5%" />Comunicazioni</a></div>
+		<?php } ?>
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/utility.php"><img src="../../images/59.png" style="margin-right: 10px; position: relative; top: 5%" />Utility</a></div>
+	</div>
+	<?php if (isset($_SESSION['__sudoer__'])): ?>
+		<div class="drawer_lastlink"><a href="<?php echo $_SESSION['__path_to_root__'] ?>admin/sudo_manager.php?action=back"><img src="../../images/14.png" style="margin-right: 10px; position: relative; top: 5%" />DeSuDo</a></div>
+	<?php endif; ?>
+	<div class="drawer_lastlink"><a href="../../shared/do_logout.php"><img src="../../images/51.png" style="margin-right: 10px; position: relative; top: 5%" />Logout</a></div>
+</div>
 </body>
 </html>

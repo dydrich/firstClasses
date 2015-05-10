@@ -16,13 +16,27 @@ if($_REQUEST['stid'] != 0){
 }
 
 if(!isset($_REQUEST['rip'])){
-	$sel_classes_from = "SELECT rb_fc_classi_provenienza.id_classe, rb_fc_classi_provenienza.id_scuola, CONCAT_WS(', ', rb_fc_scuole_provenienza.descrizione, rb_fc_classi_provenienza.descrizione) AS description ";
-	$sel_classes_from .= "FROM rb_fc_classi_provenienza, rb_fc_scuole_provenienza ";
-	$sel_classes_from .= "WHERE rb_fc_classi_provenienza.id_scuola <> 5 AND rb_fc_classi_provenienza.id_scuola = rb_fc_scuole_provenienza.id_scuola";
+	$sel_classes_from = "SELECT rb_fc_classi_provenienza.id_classe,
+						 rb_fc_classi_provenienza.id_scuola,
+						 CONCAT_WS(', ', rb_fc_scuole_provenienza.descrizione,
+						 rb_fc_classi_provenienza.descrizione) AS description
+						 FROM rb_fc_classi_provenienza, rb_fc_scuole_provenienza
+						 WHERE rb_fc_classi_provenienza.id_scuola <> 5
+						 AND rb_fc_classi_provenienza.id_scuola = rb_fc_scuole_provenienza.id_scuola
+						 AND ordine_di_scuola = {$_SESSION['__school_order__']}";
 }
 else {
 	$sel_classes_from = "SELECT id_classe, descrizione AS description FROM rb_fc_classi_provenienza WHERE rb_fc_classi_provenienza.id_scuola = 5 ORDER BY descrizione ";
 }
 $res_classes_from = $db->executeQuery($sel_classes_from);
+
+$navigation_label = "";
+if ($_SESSION['__school_order__'] ==1) {
+	$navigation_label = "scuola secondaria";
+}
+else {
+	$navigation_label = "scuola primaria";
+}
+$drawer_label = "Modifica alunno";
 
 include "student.html.php";

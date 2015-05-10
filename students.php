@@ -50,7 +50,20 @@ if(isset($_REQUEST['q'])){
 	}
 }
 	
-$sel_students = "SELECT id_alunno, CONCAT_WS(' ', cognome, nome) AS name, ripetente, H, sesso, voto, CONCAT_WS('. ', diagnosi_h, note) AS note, rb_fc_scuole_provenienza.id_scuola AS school, rb_fc_alunni.id_classe, classe_provenienza, CONCAT_WS(', ', rb_fc_scuole_provenienza.codice, rb_fc_classi_provenienza.descrizione) AS class_from FROM rb_fc_alunni, rb_fc_classi_provenienza, rb_fc_scuole_provenienza WHERE rb_fc_alunni.classe_provenienza = rb_fc_classi_provenienza.id_classe AND rb_fc_classi_provenienza.id_scuola = rb_fc_scuole_provenienza.id_scuola $query_params ORDER BY $order";
+$sel_students = "SELECT id_alunno,
+				 CONCAT_WS(' ', cognome, nome) AS name,
+				 ripetente, H, sesso, voto,
+				 CONCAT_WS('. ', diagnosi_h, note) AS note,
+				 rb_fc_scuole_provenienza.id_scuola AS school,
+				 rb_fc_alunni.id_classe,
+				 classe_provenienza,
+				 CONCAT_WS(', ', rb_fc_scuole_provenienza.codice, rb_fc_classi_provenienza.descrizione) AS class_from
+				 FROM rb_fc_alunni, rb_fc_classi_provenienza, rb_fc_scuole_provenienza
+				 WHERE rb_fc_alunni.ordine_di_scuola = {$_SESSION['__school_order__']}
+				 AND rb_fc_alunni.classe_provenienza = rb_fc_classi_provenienza.id_classe
+				 AND rb_fc_classi_provenienza.id_scuola = rb_fc_scuole_provenienza.id_scuola $query_params
+				 ORDER BY $order";
+
 try{
 	$res_students = $db->executeQuery($sel_students);
 } catch(MySQLException $ex){
@@ -61,7 +74,7 @@ $n_std = $res_students->num_rows;
 /*
  * let's match colors and classes
  */
-$sel_cls = "SELECT * FROM rb_fc_classi ORDER BY descrizione";
+$sel_cls = "SELECT * FROM rb_fc_classi WHERE ordine_di_scuola = {$_SESSION['__school_order__']} ORDER BY descrizione";
 $res_cls = $db->executeQuery($sel_cls);
 $classes_and_colors = array();
 $x = 1;
@@ -69,18 +82,14 @@ while($cls = $res_cls->fetch_assoc()){
 	$classes_and_colors[$cls['id_classe']] = array("id" => $cls['id_classe'], "name" => $cls['descrizione'], "color" =>$_SESSION['__colors__'][$x]['color']);
 	$x++;
 }
-/*
-$sel_classes_from = "SELECT id_classe, id_scuola FROM fc_classi_provenienza WHERE id_scuola <> 5";
-$res_classes_from = $db->executeQuery($sel_classes_from);
-$colors_from = array();
-$x = 1;
-while($class_from = $res_classes_from->fetch_assoc()){
-	$colors_from[$class_from['id_classe']] = $_SESSION['__colors__'][$x]['color'];
-	$x++;
-}
-*/
 
-$sel_cls = "SELECT * FROM rb_fc_classi ORDER BY descrizione";
-$res_cls = $db->executeQuery($sel_cls);
+$navigation_label = "";
+if ($_SESSION['__school_order__'] ==1) {
+	$navigation_label = "scuola secondaria";
+}
+else {
+	$navigation_label = "scuola primaria";
+}
+$drawer_label = "Elenco alunni (estratti ". $n_std ." studenti)";
 
 include "students.html.php";

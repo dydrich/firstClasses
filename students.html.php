@@ -10,94 +10,94 @@
 	<script type="text/javascript" src="../../js/jquery-ui-timepicker-addon.js"></script>
 	<script type="text/javascript" src="../../js/page.js"></script>
 	<script type="text/javascript">
-	var colors_and_classes = new Array();
-	var delete_on_assign = <?php if(isset($_REQUEST['q']) && $_REQUEST['q'] == "not_assigned") print("true"); else print("false") ?>;
-	<?php
-	foreach($classes_and_colors as $a){
-	?>
-	colors_and_classes[<?php print $a['id'] ?>] = {id: "<?php print $a['id'] ?>", cls: "<?php print $a['name'] ?>", color: "<?php print $a['color'] ?>" };
-	<?php } ?>
-	var win;
+		$(function(){
+			load_jalert();
+			setOverlayEvent();
+		});
 
-	var update_class = function(id, sel){
-		cl = sel.value;
+		var colors_and_classes = new Array();
+		var delete_on_assign = <?php if(isset($_REQUEST['q']) && $_REQUEST['q'] == "not_assigned") print("true"); else print("false") ?>;
+		<?php
+		foreach($classes_and_colors as $a){
+		?>
+		colors_and_classes[<?php print $a['id'] ?>] = {id: "<?php print $a['id'] ?>", cls: "<?php print $a['name'] ?>", color: "<?php print $a['color'] ?>" };
+		<?php } ?>
 
-		$.ajax({
-			type: "POST",
-			url: "upd_class.php",
-			data:  {std: id, cl: cl},
-			dataType: 'json',
-			error: function(data, status, errore) {
-				alert("Si e' verificato un errore");
-				return false;
-			},
-			succes: function(result) {
-				alert("ok");
-			},
-			complete: function(data, status){
-				r = data.responseText;
-				var json = $.parseJSON(r);
-				if(json.status == "kosql"){
-					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
-					return;
-				}
-				else {
-					$('#not1').text(json.message);
-					$('#not1').show(1000);
-					window.setTimeout("$('#not1').hide(1000)", 2000);
-					if(cl == "0"){
-						$('#tr'+json.id).style.backgroundColor = "";
-						return false;
-					}
+		var update_class = function(id, sel){
+			cl = sel.value;
 
-					obj = colors_and_classes[cl];
-					color = obj.color;
-					if(delete_on_assign){
-						$('#tr'+json.id).hide();
+			$.ajax({
+				type: "POST",
+				url: "upd_class.php",
+				data:  {std: id, cl: cl},
+				dataType: 'json',
+				error: function(data, status, errore) {
+					j_alert("error", "Si e' verificato un errore");
+					return false;
+				},
+				succes: function(result) {
+					j_alert("alert", "ok");
+				},
+				complete: function(data, status){
+					r = data.responseText;
+					var json = $.parseJSON(r);
+					if(json.status == "kosql"){
+						j_alert("error", "Errore SQL");
+						return;
 					}
 					else {
-						$('#tr'+json.id).css({'backgroundColor': "#"+color});
+						//j_alert("alert", json.message);
+						if(cl == "0"){
+							$('#tr'+json.id).style.backgroundColor = "";
+							return false;
+						}
+
+						obj = colors_and_classes[cl];
+						color = obj.color;
+						if(delete_on_assign){
+							$('#tr'+json.id).hide();
+						}
+						else {
+							$('#tr'+json.id).css({'backgroundColor': "#"+color});
+						}
 					}
 				}
-			}
-		});
-	};
+			});
+		};
 
-	var _student = function(id){
-		url = "student.php?stid="+id;
-		document.location.href = url;
-	};
+		var _student = function(id){
+			url = "student.php?stid="+id;
+			document.location.href = url;
+		};
 
-	var del_std = function(stid){
+		var del_std = function(stid){
 
-		$.ajax({
-			type: "POST",
-			url: "manage_student.php",
-			data:  {stid: stid, action: 3},
-			dataType: 'json',
-			error: function(data, status, errore) {
-				alert("Si e' verificato un errore");
-				return false;
-			},
-			succes: function(result) {
-				alert("ok");
-			},
-			complete: function(data, status){
-				r = data.responseText;
-				var json = $.parseJSON(r);
-				if(json.status == "kosql"){
-					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
-					return;
+			$.ajax({
+				type: "POST",
+				url: "manage_student.php",
+				data:  {stid: stid, action: 3},
+				dataType: 'json',
+				error: function(data, status, errore) {
+					j_alert("error", "Si e' verificato un errore");
+					return false;
+				},
+				succes: function(result) {
+					j_alert("alert", "ok");
+				},
+				complete: function(data, status){
+					r = data.responseText;
+					var json = $.parseJSON(r);
+					if(json.status == "kosql"){
+						j_alert("error", "Errore SQL");
+						return;
+					}
+					else {
+						j_alert("alert", json.message);
+						$('#tr'+stid).hide();
+					}
 				}
-				else {
-					$('#not1').text(json.message);
-					$('#not1').show(1000);
-					window.setTimeout("$('#not1').hide(1000)", 2000);
-					$('#tr'+stid).hide();
-				}
-			}
-		});
-	};
+			});
+		};
 
 	</script>
 </head>
@@ -109,14 +109,17 @@
 		<?php include "menu.php" ?>
 	</div>
 	<div id="left_col">
-		<div class="group_head">
-			Alunni classi prime (<?php echo $n_std ?> studenti)
-		</div>
 		<div id="not1" class="notification"></div>
 		<form id="my_form" style="border: 1px solid #666666; border-radius: 10px; margin-top: 20px; text-align: left; width: 90%; margin-left: auto; margin-right: auto" method="post">
 			<table style="border-collapse: collapse; width: 95%; margin: 30px auto 20px auto">
 				<thead>
-				<tr><td style="text-align: right; padding-bottom: 20px" colspan="9"><a href="insert_students.php" style="float: left">Aggiungi alunno</a><a href="students.php?q=assigned&order=<?php echo $req_order ?>">Solo alunni gi&agrave; assegnati</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="students.php?q=not_assigned&order=<?php echo $req_order ?>">Solo alunni non assegnati</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="students.php?order=<?php echo $req_order ?>">Tutti</a></td></tr>
+				<tr><td style="text-align: right; padding-bottom: 20px" colspan="9">
+						<a href="insert_students.php" style="float: left" class="material_link">Aggiungi alunno</a>
+						<a href="students.php?q=assigned&order=<?php echo $req_order ?>" class="material_link nav_link_first">Solo alunni gi&agrave; assegnati</a>
+						<a href="students.php?q=not_assigned&order=<?php echo $req_order ?>" class="material_link nav_link">Solo alunni non assegnati</a>
+						<a href="students.php?order=<?php echo $req_order ?>" class="material_link nav_link_last">Tutti</a>
+					</td>
+				</tr>
 				<tr style="font-weight: bold; height: 30px">
 					<td style="width: 25%; border-bottom: 1px solid #cccccc"><a href="students.php?q=<?php echo $q ?>">Cognome e nome</a></td>
 					<td style="width: 5%; text-align: center; border-bottom: 1px solid #cccccc"><a href="students.php?order=rip&q=<?php echo $q ?>">Rip</a></td>
@@ -191,5 +194,20 @@
 	<p class="spacer"></p>
 </div>
 <?php include "../../intranet/{$_SESSION['__mod_area__']}/footer.php" ?>
+<div id="drawer" class="drawer" style="display: none; position: absolute">
+	<div style="width: 100%; height: 430px">
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/index.php"><img src="../../images/6.png" style="margin-right: 10px; position: relative; top: 5%" />Home</a></div>
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/profile.php"><img src="../../images/33.png" style="margin-right: 10px; position: relative; top: 5%" />Profilo</a></div>
+		<div class="drawer_link"><a href="../../modules/documents/load_module.php?module=docs&area=<?php echo $_SESSION['__area__'] ?>"><img src="../../images/11.png" style="margin-right: 10px; position: relative; top: 5%" />Documenti</a></div>
+		<?php if(is_installed("com")){ ?>
+			<div class="drawer_link"><a href="<?php echo $_SESSION['__path_to_root__'] ?>modules/communication/load_module.php?module=com&area=<?php echo $_SESSION['__area__'] ?>"><img src="../../images/57.png" style="margin-right: 10px; position: relative; top: 5%" />Comunicazioni</a></div>
+		<?php } ?>
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/utility.php"><img src="../../images/59.png" style="margin-right: 10px; position: relative; top: 5%" />Utility</a></div>
+	</div>
+	<?php if (isset($_SESSION['__sudoer__'])): ?>
+		<div class="drawer_lastlink"><a href="<?php echo $_SESSION['__path_to_root__'] ?>admin/sudo_manager.php?action=back"><img src="../../images/14.png" style="margin-right: 10px; position: relative; top: 5%" />DeSuDo</a></div>
+	<?php endif; ?>
+	<div class="drawer_lastlink"><a href="../../shared/do_logout.php"><img src="../../images/51.png" style="margin-right: 10px; position: relative; top: 5%" />Logout</a></div>
+</div>
 </body>
 </html>

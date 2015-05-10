@@ -10,6 +10,11 @@
 	<script type="text/javascript" src="../../js/jquery-ui-timepicker-addon.js"></script>
 	<script type="text/javascript" src="../../js/page.js"></script>
 	<script type="text/javascript">
+		$(function(){
+			load_jalert();
+			setOverlayEvent();
+		});
+
 		var check_val = function(idc){
 			if ($('#cl_'+idc).prop('checked')){
 				$('input:checkbox.ck'+idc).prop('checked', true);
@@ -26,7 +31,7 @@
 				data:  $('#my_form').serialize(true),
 				dataType: 'json',
 				error: function(data, status, errore) {
-					alert("Si e' verificato un errore");
+					j_alert("error", "Si e' verificato un errore");
 					return false;
 				},
 				succes: function(result) {
@@ -36,14 +41,15 @@
 					r = data.responseText;
 					var json = $.parseJSON(r);
 					if(json.status == "kosql"){
-						alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+						j_alert("error", "Errore SQL: "+json.message);
+						console.debug(json.query);
 						return;
 					}
 					else {
-						$('#not1').text(json.message);
-						$('#not1').show(1000);
-						window.setTimeout("$('#not1').hide(1000)", 2000);
-						window.setTimeout("document.location.href='students.php'", 2000);
+						j_alert("alert", json.message);
+						setTimeout(function() {
+							document.location.href = 'students.php';
+						}, 2000);
 					}
 				}
 			});
@@ -59,12 +65,8 @@
 		<?php include "menu.php" ?>
 	</div>
 	<div id="left_col">
-		<div class="group_head">
-			Alunni ripetenti
-		</div>
-		<div id="not1" class="notification"></div>
-		<form id="my_form" style="border: 1px solid #aaaaaa; border-radius: 10px; margin-top: 20px; text-align: left; width: 90%; margin-left: auto; margin-right: auto" method="post">
-			<table style="border-collapse: collapse; width: 90%; margin: 10px auto 20px auto">
+		<form id="my_form" style="border-radius: 10px; margin-top: 20px; text-align: left; width: 90%; margin-left: auto; margin-right: auto" method="post">
+			<table style="border-collapse: collapse; width: 90%; margin: 0 auto 10px auto">
 				<tbody>
 				<?php
 				foreach ($students as $idc => $class) {
@@ -103,11 +105,26 @@
 			<input type="hidden" name="action" id="action" value="5" />
 		</form>
 		<div style="width: 95%; margin-top: 20px" class="_right">
-			<a href="#" onclick="import_students()" class="standard_link">Importa alunni</a>
+			<a href="#" onclick="import_students()" class="material_link">Importa alunni</a>
 		</div>
 	</div>
 	<p class="spacer"></p>
 </div>
 <?php include "../../intranet/{$_SESSION['__mod_area__']}/footer.php" ?>
+<div id="drawer" class="drawer" style="display: none; position: absolute">
+	<div style="width: 100%; height: 430px">
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/index.php"><img src="../../images/6.png" style="margin-right: 10px; position: relative; top: 5%" />Home</a></div>
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/profile.php"><img src="../../images/33.png" style="margin-right: 10px; position: relative; top: 5%" />Profilo</a></div>
+		<div class="drawer_link"><a href="../../modules/documents/load_module.php?module=docs&area=<?php echo $_SESSION['__area__'] ?>"><img src="../../images/11.png" style="margin-right: 10px; position: relative; top: 5%" />Documenti</a></div>
+		<?php if(is_installed("com")){ ?>
+			<div class="drawer_link"><a href="<?php echo $_SESSION['__path_to_root__'] ?>modules/communication/load_module.php?module=com&area=<?php echo $_SESSION['__area__'] ?>"><img src="../../images/57.png" style="margin-right: 10px; position: relative; top: 5%" />Comunicazioni</a></div>
+		<?php } ?>
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/utility.php"><img src="../../images/59.png" style="margin-right: 10px; position: relative; top: 5%" />Utility</a></div>
+	</div>
+	<?php if (isset($_SESSION['__sudoer__'])): ?>
+		<div class="drawer_lastlink"><a href="<?php echo $_SESSION['__path_to_root__'] ?>admin/sudo_manager.php?action=back"><img src="../../images/14.png" style="margin-right: 10px; position: relative; top: 5%" />DeSuDo</a></div>
+	<?php endif; ?>
+	<div class="drawer_lastlink"><a href="../../shared/do_logout.php"><img src="../../images/51.png" style="margin-right: 10px; position: relative; top: 5%" />Logout</a></div>
+</div>
 </body>
 </html>

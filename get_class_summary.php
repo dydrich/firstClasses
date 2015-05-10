@@ -1,5 +1,9 @@
 <?php
 
+/*
+ * calcola e restituisce i valori riepilogativi della classe
+ */
+
 include "../../lib/start.php";
 
 check_session();

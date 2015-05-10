@@ -7,7 +7,7 @@ check_permission(DIR_PERM);
 
 $_SESSION['__class_id__'] = $_REQUEST['class_id'];
 	
-$sel_desc = "SELECT rb_fc_scuole_provenienza.descrizione AS sc, rb_fc_classi_provenienza.descrizione AS descrizione FROM rb_fc_classi_provenienza, rb_fc_scuole_provenienza WHERE rb_fc_classi_provenienza.id_scuola = rb_fc_scuole_provenienza.id_scuola AND id_classe = ".$_REQUEST['class_id'];
+$sel_desc = "SELECT rb_fc_scuole_provenienza.descrizione AS sc, rb_fc_classi_provenienza.descrizione AS descrizione FROM rb_fc_classi_provenienza, rb_fc_scuole_provenienza WHERE ordine_di_scuola = {$_SESSION['__school_order__']} AND rb_fc_classi_provenienza.id_scuola = rb_fc_scuole_provenienza.id_scuola AND id_classe = ".$_REQUEST['class_id'];
 $class_desc = $db->executeQuery($sel_desc);
 $sc = $class_desc->fetch_assoc();
 
@@ -51,7 +51,7 @@ $sel_avg = "SELECT ROUND(AVG(voto), 2) FROM rb_fc_alunni WHERE classe_provenienz
 $avg = $db->executeCount($sel_avg);
 
 /* class colors */
-$sel_cls = "SELECT * FROM rb_fc_classi ORDER BY descrizione";
+$sel_cls = "SELECT * FROM rb_fc_classi WHERE ordine_di_scuola = {$_SESSION['__school_order__']} ORDER BY descrizione";
 $res_cls = $db->executeQuery($sel_cls);
 $classes_and_colors = array();
 $x = 1;
@@ -59,5 +59,14 @@ while($cls = $res_cls->fetch_assoc()){
 	$classes_and_colors[$cls['id_classe']] = array("id" => $cls['id_classe'], "name" => $cls['descrizione'], "color" =>$_SESSION['__colors__'][$x]['color']);
 	$x++;
 }
+
+$navigation_label = "";
+if ($_SESSION['__school_order__'] ==1) {
+	$navigation_label = "scuola secondaria";
+}
+else {
+	$navigation_label = "scuola primaria";
+}
+$drawer_label = "Classe di provenienza";
 
 include "class_from.html.php";

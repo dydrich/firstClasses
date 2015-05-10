@@ -13,12 +13,24 @@ check_permission(DIR_PERM);
 
 $year = $_SESSION['__current_year__']->get_ID();
 
-$sel_students = "SELECT id_alunno, cognome, nome, rb_alunni.id_classe, sezione, ROUND(AVG(voto), 2) AS voto ";
-$sel_students .= "FROM rb_alunni, rb_classi, rb_scrutini ";
-$sel_students .= "WHERE rb_alunni.id_classe = rb_classi.id_classe AND anno_corso = 1 AND ordine_di_scuola = 1 AND id_alunno = alunno AND anno = {$year} AND quadrimestre = 2 AND (materia <> 2 AND materia <> 26) AND id_alunno NOT IN (SELECT id_archivio FROM rb_fc_alunni WHERE id_archivio IS NOT NULL) ";
-$sel_students .= "GROUP BY alunno ORDER BY sezione, cognome, nome";
-//echo $sel_students;
-$res_students = $db->executeQuery($sel_students);
+$sel_students = "SELECT id_alunno, cognome, nome, rb_alunni.id_classe, sezione, ROUND(AVG(voto), 2) AS voto
+				 FROM rb_alunni, rb_classi, rb_scrutini
+				 WHERE rb_alunni.id_classe = rb_classi.id_classe
+				 AND anno_corso = 1
+				 AND ordine_di_scuola = {$_SESSION['__school_order__']}
+				 AND id_alunno = alunno
+				 AND anno = {$year}
+				 AND quadrimestre = 2
+				 AND (materia <> 2 AND materia <> 26)
+				 AND id_alunno NOT IN (SELECT id_archivio FROM rb_fc_alunni WHERE id_archivio IS NOT NULL)
+				 GROUP BY alunno
+				 ORDER BY sezione, cognome, nome";
+
+try {
+	$res_students = $db->executeQuery($sel_students);
+} catch (MySQLException $ex) {
+	$ex->redirect();
+}
 $students = array();
 while ($st = $res_students->fetch_assoc()){
 	if (!isset($students[$st['id_classe']])) {
@@ -27,5 +39,14 @@ while ($st = $res_students->fetch_assoc()){
 	}
 	$students[$st['id_classe']]['alunni'][$st['id_alunno']] = array("cognome" => $st['cognome'], "nome" => $st['nome'], "voto" => $st['voto']);
 }
+
+$navigation_label = "";
+if ($_SESSION['__school_order__'] ==1) {
+	$navigation_label = "scuola secondaria";
+}
+else {
+	$navigation_label = "scuola primaria";
+}
+$drawer_label = "Alunni ripetenti";
 
 include "ripetenti.html.php";

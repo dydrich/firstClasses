@@ -9,7 +9,6 @@
 	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/jquery-ui.min.css" type="text/css" media="screen,projection" />
 	<script type="text/javascript" src="../../js/jquery-2.0.3.min.js"></script>
 	<script type="text/javascript" src="../../js/jquery-ui-1.10.3.custom.min.js"></script>
-	<script type="text/javascript" src="../../js/jquery-ui-timepicker-addon.js"></script>
 	<script type="text/javascript" src="../../js/page.js"></script>
 	<script type="text/javascript">
 		$(function(){
@@ -68,7 +67,7 @@
 	</div>
 	<div id="left_col">
 		<form id="my_form" style="margin-top: 20px; text-align: left; width: 80%; margin-left: auto; margin-right: auto">
-		<table style='width: 95%; margin: 20px auto 20px auto; padding-top: 20px;'>
+		<table style='width: 95%; margin: 20px auto 10px auto; padding-top: 20px;'>
 			<tr>
 				<td style='width: 40%; font-weight: bold'>Nome</td>
 				<td style='width: 60%'>
@@ -82,7 +81,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td style='width: 40%; font-weight: bold'>Primaria comprensivo</td>
+				<td style='width: 40%; font-weight: bold'><?php if ($_SESSION['__school_order__'] == 1) echo "Primaria"; else echo "Infanzia" ?>  comprensivo</td>
 				<td style='width: 60%'>
 					<input type='checkbox' class="form_input" name='is_sc' id='is_sc' value='1' <?php if (isset($school) && $school['comprensivo'] == 1) echo "checked" ?> />
 				</td>
@@ -91,7 +90,7 @@
 				<td colspan='2' style='padding-top: 20px; text-align: right; padding-right: 5%'>
 					<a href='#' class="material_link nav_link_first" onclick='upd_school(<?php echo $action ?>, <?php echo $_REQUEST['id'] ?>, <?php echo $classes_count ?>)'>Salva</a>
 					<?php if ($_REQUEST['id'] != 0): ?>
-					|<a href='#' class="material_link nav_link_last" id='del_h' onclick='upd_school(3, <?php echo $_REQUEST['id'] ?>, <?php echo $classes_count ?>)'>Elimina</a>
+					<a href='#' class="material_link nav_link_last" id='del_h' onclick='upd_school(3, <?php echo $_REQUEST['id'] ?>, <?php echo $classes_count ?>)'>Elimina</a>
 					<?php endif; ?>
 				</td>
 			</tr>
@@ -101,5 +100,20 @@
 	<p class="spacer"></p>
 </div>
 <?php include "../../intranet/{$_SESSION['__mod_area__']}/footer.php" ?>
+<div id="drawer" class="drawer" style="display: none; position: absolute">
+	<div style="width: 100%; height: 430px">
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/index.php"><img src="../../images/6.png" style="margin-right: 10px; position: relative; top: 5%" />Home</a></div>
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/profile.php"><img src="../../images/33.png" style="margin-right: 10px; position: relative; top: 5%" />Profilo</a></div>
+		<div class="drawer_link"><a href="../../modules/documents/load_module.php?module=docs&area=<?php echo $_SESSION['__area__'] ?>"><img src="../../images/11.png" style="margin-right: 10px; position: relative; top: 5%" />Documenti</a></div>
+		<?php if(is_installed("com")){ ?>
+			<div class="drawer_link"><a href="<?php echo $_SESSION['__path_to_root__'] ?>modules/communication/load_module.php?module=com&area=<?php echo $_SESSION['__area__'] ?>"><img src="../../images/57.png" style="margin-right: 10px; position: relative; top: 5%" />Comunicazioni</a></div>
+		<?php } ?>
+		<div class="drawer_link"><a href="../../intranet/<?php echo $_SESSION['__mod_area__'] ?>/utility.php"><img src="../../images/59.png" style="margin-right: 10px; position: relative; top: 5%" />Utility</a></div>
+	</div>
+	<?php if (isset($_SESSION['__sudoer__'])): ?>
+		<div class="drawer_lastlink"><a href="<?php echo $_SESSION['__path_to_root__'] ?>admin/sudo_manager.php?action=back"><img src="../../images/14.png" style="margin-right: 10px; position: relative; top: 5%" />DeSuDo</a></div>
+	<?php endif; ?>
+	<div class="drawer_lastlink"><a href="../../shared/do_logout.php"><img src="../../images/51.png" style="margin-right: 10px; position: relative; top: 5%" />Logout</a></div>
+</div>
 </body>
 </html>
