@@ -3,6 +3,7 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<title><?php print $_SESSION['__config__']['intestazione_scuola'] ?>:: classi prime scuola secondaria</title>
+	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,400italic,600,600italic,700,700italic,900,200' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/reg.css" type="text/css" media="screen,projection" />
 	<link rel="stylesheet" href="../../css/general.css" type="text/css" media="screen,projection" />
 	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/jquery-ui.min.css" type="text/css" media="screen,projection" />
@@ -11,6 +12,11 @@
 	<script type="text/javascript" src="../../js/jquery-ui-timepicker-addon.js"></script>
 	<script type="text/javascript" src="../../js/page.js"></script>
 	<script type="text/javascript">
+		$(function(){
+			load_jalert();
+			setOverlayEvent();
+		});
+
 		var upd_school = function(action, id, classes_count){
 
 			if(action == 3 && classes_count > 0){
@@ -26,7 +32,7 @@
 				data: {action: action, class_id: id, class_name: name, class_code: code, is_sc: comp},
 				dataType: 'json',
 				error: function(data, status, errore) {
-					alert("Si e' verificato un errore");
+					j_alert("error", "Si e' verificato un errore");
 					return false;
 				},
 				succes: function(result) {
@@ -36,13 +42,11 @@
 					r = data.responseText;
 					var json = $.parseJSON(r);
 					if(json.status == "kosql"){
-						alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+						j_alert("error", "Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
 						return;
 					}
 					else {
-						$('#not1').text(json.message);
-						$('#not1').show(1000);
-						window.setTimeout("$('#not1').hide(1000)", 2000);
+						j_alert("alert", json.message);
 						if (action == 3){
 							window.setTimeout("document.location.href='schools.php'", 3000);
 						}
@@ -63,11 +67,7 @@
 		<?php include "menu.php" ?>
 	</div>
 	<div id="left_col">
-		<div class="group_head">
-			Scuola di provenienza
-		</div>
-		<div id="not1" class="notification"></div>
-		<form id="my_form" style="border: 1px solid #666666; border-radius: 10px; margin-top: 20px; text-align: left; width: 80%; margin-left: auto; margin-right: auto">
+		<form id="my_form" style="margin-top: 20px; text-align: left; width: 80%; margin-left: auto; margin-right: auto">
 		<table style='width: 95%; margin: 20px auto 20px auto; padding-top: 20px;'>
 			<tr>
 				<td style='width: 40%; font-weight: bold'>Nome</td>
@@ -89,9 +89,9 @@
 			</tr>
 			<tr>
 				<td colspan='2' style='padding-top: 20px; text-align: right; padding-right: 5%'>
-					<a href='#' class="standard_link nav_link_first" onclick='upd_school(<?php echo $action ?>, <?php echo $_REQUEST['id'] ?>, <?php echo $classes_count ?>)'>Salva</a>
+					<a href='#' class="material_link nav_link_first" onclick='upd_school(<?php echo $action ?>, <?php echo $_REQUEST['id'] ?>, <?php echo $classes_count ?>)'>Salva</a>
 					<?php if ($_REQUEST['id'] != 0): ?>
-					|<a href='#' class="standard_link nav_link_last" id='del_h' onclick='upd_school(3, <?php echo $_REQUEST['id'] ?>, <?php echo $classes_count ?>)'>Elimina</a>
+					|<a href='#' class="material_link nav_link_last" id='del_h' onclick='upd_school(3, <?php echo $_REQUEST['id'] ?>, <?php echo $classes_count ?>)'>Elimina</a>
 					<?php endif; ?>
 				</td>
 			</tr>

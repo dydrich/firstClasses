@@ -61,7 +61,8 @@ switch($_REQUEST['action']){
 			$res_fc_alunni = $db->executeQuery("SELECT id_classe, id_archivio FROM rb_fc_alunni");
 			while ($row = $res_fc_alunni->fetch_assoc()) {
 				$new_cls = $fc_cls[$row['id_classe']];
-				$db->executeUpdate("UPDATE rb_alunni SET id_classe = ".$new_cls." WHERE id_alunno = ".$row['id_archivio']);
+				$db->executeUpdate("UPDATE rb_alunni SET attivo = 1, id_classe = ".$new_cls." WHERE id_alunno = ".$row['id_archivio']);
+				//echo "UPDATE rb_alunni SET id_classe = ".$new_cls." WHERE id_alunno = ".$row['id_archivio'];
 			}
 		} catch (MySQLException $ex){
 			$response['status'] = "kosql";

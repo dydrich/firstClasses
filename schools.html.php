@@ -3,6 +3,7 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<title><?php print $_SESSION['__config__']['intestazione_scuola'] ?>:: classi prime scuola secondaria</title>
+	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,400italic,600,600italic,700,700italic,900,200' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/reg.css" type="text/css" media="screen,projection" />
 	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/jquery-ui.min.css" type="text/css" media="screen,projection" />
 	<script type="text/javascript" src="../../js/jquery-2.0.3.min.js"></script>
@@ -10,7 +11,10 @@
 	<script type="text/javascript" src="../../js/jquery-ui-timepicker-addon.js"></script>
 	<script type="text/javascript" src="../../js/page.js"></script>
 	<script type="text/javascript">
-	var win;
+		$(function(){
+			load_jalert();
+			setOverlayEvent();
+		});
 
 	var add_class = function(school){
 		var cls = prompt("Inserisci le classi (nel formato 5A), separate da una virgola");
@@ -27,7 +31,7 @@
 			data: {action: '4', school_id: school},
 			dataType: 'json',
 			error: function(data, status, errore) {
-				alert("Si e' verificato un errore");
+				j_alert("error", "Si e' verificato un errore");
 				return false;
 			},
 			succes: function(result) {
@@ -37,13 +41,11 @@
 				r = data.responseText;
 				var json = $.parseJSON(r);
 				if(json.status == "kosql"){
-					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+					j_alert("error", "Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
 					return;
 				}
 				else {
-					$('#not1').text(json.message);
-					$('#not1').show(1000);
-					window.setTimeout("$('#not1').hide(1000)", 2000);
+					j_alert("alert", json.message);
 					var _cls = json.classi;
 					var max = json.max;
 					var _arr_cls = _cls.split(",");
@@ -79,7 +81,7 @@
 			data: {action: '2', school_id: school, class_names: cls},
 			dataType: 'json',
 			error: function(data, status, errore) {
-				alert("Si e' verificato un errore");
+				j_alert("error", "Si e' verificato un errore");
 				return false;
 			},
 			succes: function(result) {
@@ -89,13 +91,11 @@
 				r = data.responseText;
 				var json = $.parseJSON(r);
 				if(json.status == "kosql"){
-					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+					j_alert("error", "Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
 					return;
 				}
 				else {
-					$('#not1').text(json.message);
-					$('#not1').show(1000);
-					window.setTimeout("$('#not1').hide(1000)", 2000);
+					j_alert("alert", json.message);
 					var _cls = json.classi;
 					var max = json.max;
 					var _arr_cls = _cls.split(",");
@@ -136,10 +136,11 @@
 		<?php include "menu.php" ?>
 	</div>
 	<div id="left_col">
-		<div class="group_head">
-			Elenco scuole e classi di provenienza
+		<div style="position: absolute; top: 75px; margin-left: 625px; margin-bottom: 5px" class="rb_button">
+			<a href="dettaglio_scuola.php?id=0">
+				<img src="../../images/39.png" style="padding: 12px 0 0 12px" />
+			</a>
 		</div>
-		<div id="not1" class="notification"></div>
 		<div style="width: 85%; margin: auto">
             <table id="sc_table" style="margin-top: 20px; width: 90%">
             <?php
@@ -170,9 +171,6 @@
             }
             ?>
             </table>
-		</div>
-		<div style="width: 85%; margin: 40px auto 0 auto; text-align: right">
-		<a href="dettaglio_scuola.php?id=0" class="standard_link nav_link">Nuova scuola</a>
 		</div>
     </div>
 	<div class="clear"></div>

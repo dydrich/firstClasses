@@ -23,4 +23,7 @@ else {
 	$action = 2;
 }
 
+$navigation_label = "registro elettronico ";
+$drawer_label = "Scuola di provenienza";
+
 include "dettaglio_scuola.html.php";

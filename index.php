@@ -41,4 +41,7 @@ while($cl1 = $res_fc->fetch_assoc()){
 	$x++;
 }
 
+$navigation_label = "registro elettronico ";
+$drawer_label = "Nuove classi";
+
 include "index.html.php";

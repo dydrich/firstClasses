@@ -36,4 +36,7 @@ $n_cls = $res_classes->num_rows;
 $sel_mv = "SELECT ROUND(AVG(voto), 2) FROM rb_fc_alunni";
 $mv = $db->executeCount($sel_mv);
 
+$navigation_label = "registro elettronico ";
+$drawer_label = "Classi prime";
+
 include "classes.html.php";

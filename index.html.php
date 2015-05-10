@@ -1,74 +1,76 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<title><?php print $_SESSION['__config__']['intestazione_scuola'] ?>:: classi prime scuola secondaria</title>
-<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/reg.css" type="text/css" media="screen,projection" />
-<link rel="stylesheet" href="../../css/general.css" type="text/css" media="screen,projection" />
-<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/jquery-ui.min.css" type="text/css" media="screen,projection" /><script type="text/javascript" src="../../js/jquery-2.0.3.min.js"></script>
-<script type="text/javascript" src="../../js/jquery-ui-1.10.3.custom.min.js"></script>
-<script type="text/javascript" src="../../js/jquery-ui-timepicker-addon.js"></script>
-<script type="text/javascript" src="../../js/page.js"></script>
-<script type="text/javascript">
-	var associa = function(){
-		$.ajax({
-			type: "POST",
-			url: "class_manager.php",
-			data: {action: 3},
-			dataType: 'json',
-			error: function(data, status, errore) {
-				alert("Si e' verificato un errore");
-				return false;
-			},
-			succes: function(result) {
-				alert("ok");
-			},
-			complete: function(data, status){
-				r = data.responseText;
-				var json = $.parseJSON(r);
-				if(json.status == "kosql"){
-					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
-					return;
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<title><?php print $_SESSION['__config__']['intestazione_scuola'] ?>:: classi prime scuola secondaria</title>
+	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,400italic,600,600italic,700,700italic,900,200' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/reg.css" type="text/css" media="screen,projection" />
+	<link rel="stylesheet" href="../../css/general.css" type="text/css" media="screen,projection" />
+	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/jquery-ui.min.css" type="text/css" media="screen,projection" /><script type="text/javascript" src="../../js/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="../../js/jquery-ui-1.10.3.custom.min.js"></script>
+	<script type="text/javascript" src="../../js/jquery-ui-timepicker-addon.js"></script>
+	<script type="text/javascript" src="../../js/page.js"></script>
+	<script type="text/javascript">
+		var associa = function(){
+			$.ajax({
+				type: "POST",
+				url: "class_manager.php",
+				data: {action: 3},
+				dataType: 'json',
+				error: function(data, status, errore) {
+					alert("Si e' verificato un errore");
+					return false;
+				},
+				succes: function(result) {
+					alert("ok");
+				},
+				complete: function(data, status){
+					r = data.responseText;
+					var json = $.parseJSON(r);
+					if(json.status == "kosql"){
+						j_alert("error", "Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+						return;
+					}
+					else {
+						j_alert("alert", json.message);
+					}
 				}
-				else {
-					$('#not1').text(json.message);
-					$('#not1').show(1000);
-					window.setTimeout("$('#not1').hide(1000)", 2000);
-				}
-			}
-		});
-	};
+			});
+		};
 
-	var termina = function(){
-		$.ajax({
-			type: "POST",
-			url: "manage_student.php",
-			data: {action: 8},
-			dataType: 'json',
-			error: function(data, status, errore) {
-				alert("Si e' verificato un errore");
-				return false;
-			},
-			succes: function(result) {
-				alert("ok");
-			},
-			complete: function(data, status){
-				r = data.responseText;
-				var json = $.parseJSON(r);
-				if(json.status == "kosql"){
-					alert("Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
-					return;
+		var termina = function(){
+			$.ajax({
+				type: "POST",
+				url: "manage_student.php",
+				data: {action: 8},
+				dataType: 'json',
+				error: function(data, status, errore) {
+					alert("Si e' verificato un errore");
+					return false;
+				},
+				succes: function(result) {
+					alert("ok");
+				},
+				complete: function(data, status){
+					r = data.responseText;
+					var json = $.parseJSON(r);
+					if(json.status == "kosql"){
+						j_alert("error", "Errore SQL. \nQuery: "+json.query+"\nErrore: "+json.message);
+						return;
+					}
+					else {
+						j_alert("alert", json.message);
+					}
 				}
-				else {
-					$('#not1').text(json.message);
-					$('#not1').show(1000);
-					window.setTimeout("$('#not1').hide(1000)", 2000);
-				}
-			}
-		});
-	};
+			});
+		};
 
-</script>
+		$(function(){
+			load_jalert();
+			setOverlayEvent();
+		});
+
+	</script>
 </head>
 <body>
 <?php include "../../intranet/{$_SESSION['__mod_area__']}/header.php" ?>
@@ -78,10 +80,6 @@
 		<?php include "menu.php" ?>
 	</div>
 	<div id="left_col">
-		<div class="group_head">
-			Gestione nuove classi prime
-		</div>
-		<div id="not1" class="notification"></div>
 		<div class="welcome">
 			<p id="w_head">Classi</p>
 			<p class="w_text" style="width: 350px">

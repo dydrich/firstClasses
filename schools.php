@@ -20,5 +20,9 @@ while($sc = $res_schools->fetch_assoc()){
 		$schools[$sc['id_sc']]['classi'][] = array("school_id" => $sc['id_sc'], "school" => $sc['school'], "class_id" => $sc['id_cl'], "class" => $sc['cls']);
 	}
 }
+
+$navigation_label = "registro elettronico ";
+$drawer_label = "Scuole di provenienza";
+
 //print_r($schools);
 include "schools.html.php";

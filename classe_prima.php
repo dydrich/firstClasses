@@ -65,4 +65,7 @@ while($class_from = $res_classes_from->fetch_assoc()){
 $sel_mv = "SELECT ROUND(AVG(voto), 2) FROM rb_fc_alunni";
 $mv = $db->executeCount($sel_mv);
 
+$navigation_label = "registro elettronico ";
+$drawer_label = "Classe $class_desc";
+
 include "classe_prima.html.php";

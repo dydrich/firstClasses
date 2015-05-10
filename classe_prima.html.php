@@ -109,11 +109,10 @@
 	</div>
 	<div id="left_col">
 		<div style="width: 90%; height: 30px; margin: 10px auto 0 auto; text-align: center; font-size: 1.1em; text-transform: uppercase">
-			Classe <?php print $class_desc ?><span style="border-bottom: 1px solid; float: right; font-weight: bold; font-size: 12px">Media generale: <?php print $mv ?></span>
+			<span style="border-bottom: 1px solid; float: right; font-weight: bold; font-size: 12px">Media generale: <?php print $mv ?></span>
 		</div>
-		<div id="not1" class="notification"></div>
-		<form id="my_form" style="border: 1px solid #666666; border-radius: 10px; margin-top: 20px; text-align: left; width: 90%; margin-left: auto; margin-right: auto" method="post">
-	 	    <table style="border-collapse: collapse; width: 90%; margin: 10px auto 20px auto">
+		<form id="my_form" style="margin-top: 20px; text-align: left; width: 90%; margin-left: auto; margin-right: auto" method="post">
+	 	    <table style="border-collapse: collapse; width: 90%; margin: 0 auto 10px auto">
 	 	    <thead>
 	 	    	<tr>
 	 	    		<td colspan="6" style="text-align: center; font-weight: bold; border: 0; height: 30px">Riepilogo</td>

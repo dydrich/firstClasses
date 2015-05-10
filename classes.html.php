@@ -3,6 +3,7 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<title><?php print $_SESSION['__config__']['intestazione_scuola'] ?>:: classi prime scuola secondaria</title>
+	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,400italic,600,600italic,700,700italic,900,200' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/reg.css" type="text/css" media="screen,projection" />
 	<link rel="stylesheet" href="../../css/general.css" type="text/css" media="screen,projection" />
 	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/jquery-ui.min.css" type="text/css" media="screen,projection" />
@@ -10,6 +11,11 @@
 	<script type="text/javascript" src="../../js/jquery-ui-1.10.3.custom.min.js"></script>
 	<script type="text/javascript" src="../../js/jquery-ui-timepicker-addon.js"></script>
 	<script type="text/javascript">
+		$(function(){
+			load_jalert();
+			setOverlayEvent();
+		});
+
 	var _classes = function(){
 		var _cls = prompt("Inserisci le sezioni che vuoi creare, separate da una virgola");
 
@@ -117,11 +123,7 @@
 		<?php include "menu.php" ?>
 	</div>
 	<div id="left_col">
-		<div class="group_head">
-			Classi prime
-		</div>
-		<div id="not1" class="notification"></div>
-		<form id="my_form" style="border: 1px solid #666666; border-radius: 10px; margin-top: 20px; text-align: left; width: 90%; margin-left: auto; margin-right: auto" method="post">
+		<form id="my_form" style="margin-top: 20px; text-align: left; width: 90%; margin-left: auto; margin-right: auto" method="post">
 	 	    <?php if($n_cls < 1){ ?>
 	 	    <p style="margin-top: 20px; margin-bottom: 50px" class="_bold _center">Non hai ancora inserito nessuna classe.</p>
 	 	    <div style="width: 90%; text-align: right">
@@ -131,7 +133,7 @@
 	 	    <?php
 	        } else{
 	 	    ?>	
-	 	    <table style="border-collapse: collapse; width: 95%; margin: 30px auto 20px auto">
+	 	    <table style="border-collapse: collapse; width: 95%; margin: 30px auto 10px auto">
 	 	    	<thead>
 	 	    	<tr style="font-weight: bold; height: 30px">
 					<td style="width: 13%; border-bottom: 1px solid #cccccc">Classe</td>
@@ -186,8 +188,8 @@
 	 	    	<tfoot>
 	 	   		<tr>
 	 				<td colspan="8" style="text-align: right; margin-right: 10px; padding-top: 30px">
-					    <a href="#" class="standard_link nav_link_first" onclick="associa()">Associa classi</a>|
-						<a href="#" class="standard_link nav_link_last" onclick="_classes()">Aggiungi classi</a>
+					    <a href="#" class="material_link nav_link_first" onclick="associa()">Associa classi</a>
+						<a href="#" class="material_link nav_link_last" onclick="_classes()">Aggiungi classi</a>
 						<input type="hidden" name="cls" id="cls" /> 				
 	 				</td>    		
 	 	   		</tr>
