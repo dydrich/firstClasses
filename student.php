@@ -3,7 +3,7 @@
 include "../../lib/start.php";
 
 check_session();
-check_permission(DIR_PERM);
+check_permission(DIR_PERM|SEG_PERM);
 
 if($_REQUEST['stid'] != 0){
 	$sel_student = "SELECT * FROM rb_fc_alunni WHERE id_alunno = ".$_REQUEST['stid'];
@@ -23,7 +23,7 @@ if(!isset($_REQUEST['rip'])){
 						 FROM rb_fc_classi_provenienza, rb_fc_scuole_provenienza
 						 WHERE rb_fc_classi_provenienza.id_scuola <> 5
 						 AND rb_fc_classi_provenienza.id_scuola = rb_fc_scuole_provenienza.id_scuola
-						 AND ordine_di_scuola = {$_SESSION['__school_order__']}";
+						 AND rb_fc_classi_provenienza.ordine_di_scuola = {$_SESSION['__school_order__']}";
 }
 else {
 	$sel_classes_from = "SELECT id_classe, descrizione AS description FROM rb_fc_classi_provenienza WHERE rb_fc_classi_provenienza.id_scuola = 5 ORDER BY descrizione ";

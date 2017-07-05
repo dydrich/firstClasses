@@ -9,7 +9,7 @@
 include "../../lib/start.php";
 
 check_session();
-check_permission(DIR_PERM);
+check_permission(DIR_PERM|SEG_PERM);
 
 $year = $_SESSION['__current_year__']->get_ID();
 
@@ -19,7 +19,7 @@ $sel_students = "SELECT id_alunno, cognome, nome, rb_alunni.id_classe, sezione, 
 				 AND anno_corso = 1
 				 AND ordine_di_scuola = {$_SESSION['__school_order__']}
 				 AND id_alunno = alunno
-				 AND anno = {$year}
+				 AND anno = 4
 				 AND quadrimestre = 2
 				 AND (materia <> 2 AND materia <> 26)
 				 AND id_alunno NOT IN (SELECT id_archivio FROM rb_fc_alunni WHERE id_archivio IS NOT NULL)

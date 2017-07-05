@@ -3,7 +3,7 @@
 include "../../lib/start.php";
 
 check_session();
-check_permission(DIR_PERM);
+check_permission(DIR_PERM|SEG_PERM);
 
 $sel_schools = "SELECT rb_fc_scuole_provenienza.descrizione AS school,
 				rb_fc_scuole_provenienza.codice AS code,

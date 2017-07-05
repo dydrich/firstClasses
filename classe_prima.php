@@ -3,7 +3,7 @@
 include "../../lib/start.php";
 
 check_session();
-check_permission(DIR_PERM);
+check_permission(DIR_PERM|SEG_PERM);
 
 $_SESSION['__class_id__'] = $_REQUEST['id_classe'];
 	
@@ -70,7 +70,7 @@ $avg = $db->executeCount($sel_avg);
 
 /* class colors */
 $sel_classes_from = "SELECT rb_fc_classi_provenienza.id_classe, rb_fc_classi_provenienza.id_scuola, CONCAT_WS(', ', rb_fc_scuole_provenienza.codice, rb_fc_classi_provenienza.descrizione) AS description ";
-$sel_classes_from .= "FROM rb_fc_classi_provenienza, rb_fc_scuole_provenienza WHERE rb_fc_classi_provenienza.id_scuola = rb_fc_scuole_provenienza.id_scuola AND ordine_di_scuola = {$_SESSION['__school_order__']} ORDER BY rb_fc_scuole_provenienza.id_scuola, rb_fc_classi_provenienza.id_scuola";
+$sel_classes_from .= "FROM rb_fc_classi_provenienza, rb_fc_scuole_provenienza WHERE rb_fc_classi_provenienza.id_scuola = rb_fc_scuole_provenienza.id_scuola AND rb_fc_classi_provenienza.ordine_di_scuola = {$_SESSION['__school_order__']} ORDER BY rb_fc_scuole_provenienza.id_scuola, rb_fc_classi_provenienza.id_scuola";
 $res_classes_from = $db->executeQuery($sel_classes_from);
 $colors_from = array();
 $x = 1;

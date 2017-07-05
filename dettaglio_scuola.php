@@ -9,7 +9,7 @@
 include "../../lib/start.php";
 
 check_session();
-check_permission(DIR_PERM);
+check_permission(DIR_PERM|SEG_PERM);
 
 if ($_REQUEST['id'] != 0){
 	$sel_sc = "SELECT * FROM rb_fc_scuole_provenienza WHERE id_scuola = {$_REQUEST['id']}";

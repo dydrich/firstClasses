@@ -10,7 +10,7 @@
 include "../../lib/start.php";
 
 check_session();
-check_permission(DIR_PERM);
+check_permission(DIR_PERM|SEG_PERM);
 
 $year = $_SESSION['__current_year__']->get_ID();
 
