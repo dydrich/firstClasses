@@ -2,106 +2,23 @@
 <html>
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-	<title><?php print $_SESSION['__config__']['intestazione_scuola'] ?>:: classi prime scuola secondaria</title>
+	<title>Classi prime scuola secondaria</title>
 	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/reg.css" type="text/css" media="screen,projection" />
 	<link rel="stylesheet" href="../../css/general.css" type="text/css" media="screen,projection" />
 	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/jquery-ui.min.css" type="text/css" media="screen,projection" /><script type="text/javascript" src="../../js/jquery-2.0.3.min.js"></script>
 	<script type="text/javascript" src="../../js/jquery-ui-1.10.3.custom.min.js"></script>
 	<script type="text/javascript" src="../../js/page.js"></script>
 	<script type="text/javascript">
-		var id_alunno = 0;
-
-		$(function(){
-			load_jalert();
-			setOverlayEvent();
-			$('.show_list').click(function(event){
-				event.preventDefault();
-				strs = this.id.split('_');
-				id_alunno = strs[2];
-				show_students();
-			});
-			$('.sprefs').click(function(event){
-				event.preventDefault();
-				strs = this.id.split('_');
-				id_pref = strs[1];
-				save_pref(id_pref, 6);
-			});
-		});
-
-		var show_students = function (){
-			$('#students_list').dialog({
-				autoOpen: true,
-				show: {
-					effect: "appear",
-					duration: 500
-				},
-				hide: {
-					effect: "slide",
-					duration: 300
-				},
-				buttons: [{
-					text: "Chiudi",
-					click: function() {
-						$( this ).dialog( "close" );
-					}
-				}],
-				modal: true,
-				width: 450,
-				title: 'Elenco alunni',
-				open: function(event, ui){
-
-				}
-			});
-
-			//$( "#dialog" ).dialog( "open" );
-		}
-
-		var save_pref = function(id_pref, action){
-			$.ajax({
-				type: "POST",
-				url: "manage_student.php",
-				data:  {id_alunno: id_alunno, pref: id_pref, action: action},
-				dataType: 'json',
-				error: function(data, status, errore) {
-					j_alert("error", "Si e' verificato un errore");
-					return false;
-				},
-				succes: function(result) {
-					alert("ok");
-				},
-				complete: function(data, status){
-					r = data.responseText;
-					var json = $.parseJSON(r);
-					if(json.status == "kosql"){
-						j_alert("error", "Errore SQL");
-						return;
-					}
-					else {
-						if (action == 6){
-							simple_text = document.createTextNode(", ");
-							_a = document.createElement("A");
-							_a.setAttribute("href", "#");
-							a_text = document.createTextNode(json.name);
-							_a.appendChild(a_text);
-							if ($('#sp_pref_'+id_alunno).text() != ""){
-								$('#sp_pref_'+id_alunno).append(simple_text);
-							}
-							$('#sp_pref_'+id_alunno).append(_a);
-						}
-						if (action == 7){
-							document.location.reload();
-						}
-					}
-				}
-			});
-		};
-
+        $(function(){
+            load_jalert();
+            setOverlayEvent();
+        });
 	</script>
-    <style>
-        TR {
-            height: 25px;
-        }
-    </style>
+	<style>
+		TR {
+			height: 25px;
+		}
+	</style>
 </head>
 <body>
 <?php include "../../intranet/{$_SESSION['__mod_area__']}/header.php" ?>
@@ -115,34 +32,27 @@
 			<table style="border-collapse: collapse; width: 90%; margin: 10px auto 20px auto">
 				<tr style="font-weight: bold; height: 30px" class="accent_decoration">
 					<td style="width: 40%">Cognome e nome</td>
-					<td style="width: 60%">Preferenze</td>
+					<td style="width: 60%" class="_center">Preferenze</td>
 				</tr>
 				<tbody>
-			<?php
-			foreach ($students as $id => $alunno){
-			?>
-				<tr class="bottom_decoration">
-					<td style="width: 40%">
-						<a href='#' class='show_list' id='show_list_<?php echo $id ?>'>
-							<?php echo $alunno['cognome']." ".$alunno['nome'] ?></a>
-					</td>
-					<td style="width: 60%" id="trpref_<?php echo $id ?>">
 				<?php
-				$str = "";
-				foreach ($alunno['preferenze'] as $id_c => $comp){
-					$str .= "<a href='#' onclick='id_alunno = {$id};save_pref({$id_c}, 7)'>{$comp}</a>, ";
+				foreach ($students as $id => $alunno){
+					?>
+					<tr class="bottom_decoration">
+						<td style="width: 40%">
+							<a href='scelta_preferenze.php?stid=<?php echo $id ?>' class='show_list' id='show_list_<?php echo $id ?>'>
+								<?php echo $alunno['cognome']." ".$alunno['nome'] ?></a>
+						</td>
+						<td style="width: 60%" id="trpref_<?php echo $id ?>">
+							<span id="sect_<?php echo $id ?>"><?php if (isset($alunno['preferenze'][2])) echo "Corso ".$alunno['preferenze'][2].". " ?></span>
+                            <span id="teac_<?php echo $id ?>"><?php if (isset($alunno['preferenze'][1])) echo "Docenti: ".implode(", ", $alunno['preferenze'][1]).". " ?></span>
+                            <span id="othe_<?php echo $id ?>"><?php if (isset($alunno['preferenze'][3])) echo "Altre richieste: ".implode(", ", $alunno['preferenze'][3])."." ?></span>
+                            <span id="othe_<?php echo $id ?>"><?php if (isset($alunno['preferenze'][4])) echo "Note dei docenti: ".implode(", ", $alunno['preferenze'][4]) ?></span>
+						</td>
+					</tr>
+					<?php
 				}
-				$str = substr($str, 0, strlen($str) - 2);
-				if (count($alunno['preferenze']) > 0){
-					$disp = "inline";
-				}
-			?>
-						<span id="sp_pref_<?php echo $id ?>"><?php echo $str ?></span>
-					</td>
-				</tr>
-			<?php
-		}
-		?>
+				?>
 				</tbody>
 				<tfoot>
 				</tfoot>
@@ -153,17 +63,16 @@
 	</div>
 	<p class="spacer"></p>
 </div>
-<div id="students_list" style="display: none">
-<?php
-reset($students);
-foreach ($students as $id => $alunno){
+<div id="teachers_list" style="display: none">
+	<?php
+	foreach ($teacher as $id => $teacher){
+		?>
+		<p style="line-height: 10px; height: 10px; font-size: 11px">
+			<a href="#" class="sprefs" id="pref_<?php echo $id ?>"><?php echo $teacher['cognome']." ".$teacher['nome'] ?></a>
+		</p>
+		<?php
+	}
 	?>
-	<p style="line-height: 10px; height: 10px; font-size: 11px">
-		<a href="#" class="sprefs" id="pref_<?php echo $id ?>"><?php echo $alunno['cognome']." ".$alunno['nome'] ?></a>
-	</p>
-<?php
-}
-?>
 </div>
 <?php include "../../intranet/{$_SESSION['__mod_area__']}/footer.php" ?>
 <div id="drawer" class="drawer" style="display: none; position: absolute">

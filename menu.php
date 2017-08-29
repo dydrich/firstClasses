@@ -10,6 +10,7 @@
 					<li><a href="insert_students.php">Inserimento</a></li>
 					<li><a href="students.php">Elenco </a></li>
 					<li><a href="preferenze_compagni.php">Compagni </a></li>
+                    <li><a href="preferenze_didattica.php">Preferenze </a></li>
 					<?php if ($_SESSION['__school_order__'] == 1): ?>
 					<li><a href="import_students.php">Importazione</a></li>
 					<?php endif; ?>

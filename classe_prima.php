@@ -17,7 +17,8 @@ else {
 	$order = "";
 }
 
-/* students list */	
+/* students list */
+$students = [];
 $sel_students = "
 		SELECT id_alunno,
 		CONCAT_WS(' ', cognome, nome) AS name,
@@ -39,6 +40,31 @@ try{
 	$res_students = $db->executeQuery($sel_students);
 } catch(MySQLException $ex){
 	$ex->redirect();
+}
+while ($row = $res_students->fetch_assoc()) {
+	$students[$row['id_alunno']] = $row;
+	$students[$row['id_alunno']]['preferenze'] = [];
+	$p1 = $db->executeCount("SELECT COUNT(*) FROM rb_fc_preferenze_didattiche WHERE tipo_preferenza = 1 AND alunno = ".$row['id_alunno']);
+	if ($p1 > 0) {
+		$students[$row['id_alunno']]['preferenze'][] = 1;
+	}
+	$p2 = $db->executeCount("SELECT COUNT(*) FROM rb_fc_preferenze_didattiche WHERE tipo_preferenza = 2 AND alunno = ".$row['id_alunno']);
+	if ($p2 > 0) {
+		$students[$row['id_alunno']]['preferenze'][] = 2;
+		$students[$row['id_alunno']]['sect'] = $db->executeCount("SELECT valore FROM rb_fc_preferenze_didattiche WHERE tipo_preferenza = 2 AND alunno = ".$row['id_alunno']);
+	}
+	$p3 = $db->executeCount("SELECT COUNT(*) FROM rb_fc_preferenze_didattiche WHERE tipo_preferenza = 3 AND alunno = ".$row['id_alunno']);
+	if ($p3 > 0) {
+		$students[$row['id_alunno']]['preferenze'][] = 3;
+	}
+	$p4 = $db->executeCount("SELECT COUNT(*) FROM rb_fc_preferenze_didattiche WHERE tipo_preferenza = 4 AND alunno = ".$row['id_alunno']);
+	if ($p4 > 0) {
+		$students[$row['id_alunno']]['preferenze'][] = 4;
+	}
+	$p5 = $db->executeCount("SELECT COUNT(*) FROM rb_fc_preferenze_alunni WHERE alunno = ".$row['id_alunno']);
+	if ($p5 > 0) {
+		$students[$row['id_alunno']]['preferenze'][] = 5;
+	}
 }
 $n_std = $res_students->num_rows;
 

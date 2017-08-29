@@ -2,7 +2,8 @@
 <html>
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-	<title><?php print $_SESSION['__config__']['intestazione_scuola'] ?>:: classi prime scuola secondaria</title>
+	<title>Classi prime scuola secondaria</title>
+    <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
 	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/reg.css" type="text/css" media="screen,projection" />
 	<link rel="stylesheet" href="../../css/general.css" type="text/css" media="screen,projection" />
 	<link rel="stylesheet" href="../../css/site_themes/<?php echo getTheme() ?>/jquery-ui.min.css" type="text/css" media="screen,projection" /><script type="text/javascript" src="../../js/jquery-2.0.3.min.js"></script>
@@ -13,7 +14,238 @@
 		$(function(){
 			load_jalert();
 			setOverlayEvent();
+
+            $('.label1').on('click', function (event) {
+                var stid = $(this).data('stid');
+                get_teachers(stid);
+            });
+
+            $('.label3').on('click', function (event) {
+                var stid = $(this).data('stid');
+                get_other(stid);
+            });
+
+            $('.label4').on('click', function (event) {
+                var stid = $(this).data('stid');
+                get_note(stid);
+            });
+
+            $('.label5').on('click', function (event) {
+                var stid = $(this).data('stid');
+                get_students(stid);
+            });
+
+            $('.del_btn').on('click', function (event) {
+                event.preventDefault();
+                stid = $(this).data("stid");
+                j_alert("confirm", "Eliminare l'alunno?");
+            });
+
+            $('#okbutton').on('click', function (event) {
+                event.preventDefault();
+                upd_cls(stid);
+            });
 		});
+
+        var get_teachers = function(stid){
+            $.ajax({
+                type: "POST",
+                url: "manage_student.php",
+                data:  {stid: stid, action: "get_teachers"},
+                dataType: 'json',
+                error: function(data, status, errore) {
+                    j_alert("error", "Si e' verificato un errore");
+                    return false;
+                },
+                succes: function(result) {
+                    alert("ok");
+                },
+                complete: function(data, status){
+                    r = data.responseText;
+                    var json = $.parseJSON(r);
+                    if(json.status == "kosql"){
+                        j_alert("error", json.query);
+                        //j_alert("error", "Si e' verificato un errore");
+                        return;
+                    }
+                    else {
+                        $('#teachers_list').text(json.string).dialog({
+                            autoOpen: true,
+                            show: {
+                                effect: "appear",
+                                duration: 500
+                            },
+                            hide: {
+                                effect: "slide",
+                                duration: 300
+                            },
+                            buttons: [{
+                                text: "Chiudi",
+                                click: function() {
+                                    $( this ).dialog( "close" );
+                                }
+                            }],
+                            modal: true,
+                            width: 250,
+                            title: 'Elenco docenti',
+                            open: function(event, ui){
+
+                            }
+                        });
+                    }
+                }
+            });
+        };
+
+        var get_other = function(stid){
+            $.ajax({
+                type: "POST",
+                url: "manage_student.php",
+                data:  {stid: stid, action: "get_other"},
+                dataType: 'json',
+                error: function(data, status, errore) {
+                    j_alert("error", "Si e' verificato un errore");
+                    return false;
+                },
+                succes: function(result) {
+                    alert("ok");
+                },
+                complete: function(data, status){
+                    r = data.responseText;
+                    var json = $.parseJSON(r);
+                    if(json.status == "kosql"){
+                        j_alert("error", json.query);
+                        //j_alert("error", "Si e' verificato un errore");
+                        return;
+                    }
+                    else {
+                        $('#teachers_list').text(json.string).dialog({
+                            autoOpen: true,
+                            show: {
+                                effect: "appear",
+                                duration: 500
+                            },
+                            hide: {
+                                effect: "slide",
+                                duration: 300
+                            },
+                            buttons: [{
+                                text: "Chiudi",
+                                click: function() {
+                                    $( this ).dialog( "close" );
+                                }
+                            }],
+                            modal: true,
+                            width: 250,
+                            title: 'Altre richieste',
+                            open: function(event, ui){
+
+                            }
+                        });
+                    }
+                }
+            });
+        };
+
+        var get_note = function(stid){
+            $.ajax({
+                type: "POST",
+                url: "manage_student.php",
+                data:  {stid: stid, action: "get_note"},
+                dataType: 'json',
+                error: function(data, status, errore) {
+                    j_alert("error", "Si e' verificato un errore");
+                    return false;
+                },
+                succes: function(result) {
+                    alert("ok");
+                },
+                complete: function(data, status){
+                    r = data.responseText;
+                    var json = $.parseJSON(r);
+                    if(json.status == "kosql"){
+                        j_alert("error", json.query);
+                        //j_alert("error", "Si e' verificato un errore");
+                        return;
+                    }
+                    else {
+                        $('#teachers_list').text(json.string).dialog({
+                            autoOpen: true,
+                            show: {
+                                effect: "appear",
+                                duration: 500
+                            },
+                            hide: {
+                                effect: "slide",
+                                duration: 300
+                            },
+                            buttons: [{
+                                text: "Chiudi",
+                                click: function() {
+                                    $( this ).dialog( "close" );
+                                }
+                            }],
+                            modal: true,
+                            width: 250,
+                            title: 'Note docenti',
+                            open: function(event, ui){
+
+                            }
+                        });
+                    }
+                }
+            });
+        };
+
+        var get_students = function(stid){
+            $.ajax({
+                type: "POST",
+                url: "manage_student.php",
+                data:  {stid: stid, action: "get_students"},
+                dataType: 'json',
+                error: function(data, status, errore) {
+                    j_alert("error", "Si e' verificato un errore");
+                    return false;
+                },
+                succes: function(result) {
+                    alert("ok");
+                },
+                complete: function(data, status){
+                    r = data.responseText;
+                    var json = $.parseJSON(r);
+                    if(json.status == "kosql"){
+                        j_alert("error", json.query);
+                        //j_alert("error", "Si e' verificato un errore");
+                        return;
+                    }
+                    else {
+                        $('#teachers_list').text(json.string).dialog({
+                            autoOpen: true,
+                            show: {
+                                effect: "appear",
+                                duration: 500
+                            },
+                            hide: {
+                                effect: "slide",
+                                duration: 300
+                            },
+                            buttons: [{
+                                text: "Chiudi",
+                                click: function() {
+                                    $( this ).dialog( "close" );
+                                }
+                            }],
+                            modal: true,
+                            width: 250,
+                            title: 'Elenco compagni',
+                            open: function(event, ui){
+
+                            }
+                        });
+                    }
+                }
+            });
+        };
 
 		var colors_and_classes = new Array();
 		var delete_on_assign = <?php if(isset($_REQUEST['q']) && $_REQUEST['q'] == "not_assigned") print("true"); else print("false") ?>;
@@ -100,6 +332,11 @@
 		};
 
 	</script>
+    <style>
+        TR {
+            height: 35px;
+        }
+    </style>
 </head>
 <body>
 <?php include "../../intranet/{$_SESSION['__mod_area__']}/header.php" ?>
@@ -140,7 +377,7 @@
 		        </tr>
 	 	    <?php
 	        } else{
-	 	    	while($st = $res_students->fetch_assoc()) {
+				foreach ($students as $k => $st) {
 	 	    		$ripetente = ($st['ripetente'] == 1) ? "SI" : "NO";
 	 	    		$h = $dsa = $sost = "";
 	 	    		if($st['H'] != 0){
@@ -168,7 +405,41 @@
 					<td style="width: 10%; text-align: center"><?php print $st['sesso'] ?></td>
 					<td style="width: 10%; text-align: center"><?php print $st['voto'] ?></td>
 					<td style="width: 11%; text-align: center"><?php print $st['class_from'] ?></td>
-					<td style="width: 20%; text-align: center"><?php print utf8_decode($st['note']) ?></td>
+					<td style="width: 20%; text-align: center">
+                        <div style="width: 90%; margin-top: auto; display: flex; align-content: center; align-items: center; justify-content: center">
+							<?php
+							if (count($st['preferenze']) > 0) {
+								$labels = [];
+								foreach ($st['preferenze'] as $pref) {
+									if ($pref == 1) {
+										$labels[] = 'T';
+									}
+									else if ($pref == 2) {
+										$labels[] = $st['sect'];
+									}
+									else if ($pref == 3) {
+										$labels[] = 'R';
+									}
+									else if ($pref == 4) {
+										$labels[] = 'N';
+									}
+									else if ($pref == 5) {
+										$labels[] = 'S';
+									}
+								}
+								$x = 1;
+								foreach ($labels as $label) {
+									?>
+                                    <div class="round_minilabel<?php if ($label == 'T') echo " label1"; else if ($label == 'R') echo " label3"; else if ($label == 'N') echo " label4"; else if ($label == 'S') echo " label5"; ?>" style="order: <?php echo $x ?>; padding: 0" data-stid="<?php echo $k ?>" >
+                                        <div><?php echo $label ?></div>
+                                    </div>
+									<?php
+									$x++;
+								}
+							}
+							?>
+                        </div>
+                    </td>
 					<td style="width: 11%; text-align: center">
 						<select id="n_class" name="n_class" class="form_input" style="width: 90%" onchange="update_class(<?php print $st['id_alunno'] ?>, this)">
 							<option value="0">.</option>
@@ -179,7 +450,11 @@
 							<?php } ?>
 						</select>
 					</td>
-					<td style="width: 3%; font-weight: bold; text-align: center"><a style="color: red; font-weight: bold" href="#" onclick="del_std(<?php print $st['id_alunno'] ?>)">x</a></td>
+					<td style="width: 3%; font-weight: bold; text-align: center">
+                        <a style="color: red; font-weight: bold" href="#" onclick="del_std(<?php print $st['id_alunno'] ?>)">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    </td>
 	 	    	</tr>
 	 	    	<?php } ?>
 
@@ -209,5 +484,6 @@
 	<?php endif; ?>
 	<div class="drawer_lastlink"><a href="../../shared/do_logout.php"><img src="../../images/51.png" style="margin-right: 10px; position: relative; top: 5%" />Logout</a></div>
 </div>
+<div id="teachers_list" style="display: none"></div>
 </body>
 </html>

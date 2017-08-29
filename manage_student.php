@@ -173,6 +173,223 @@ switch($_REQUEST['action']){
 		echo json_encode($response);
 		exit;
 		break;
+	case 'upd_section':
+		$stid = $_POST['stid'];
+		$pref = $_POST['pref'];
+		$value = $_POST['value'];
+		try{
+			if ($value == '0') {
+				$db->executeUpdate("DELETE FROM rb_fc_preferenze_didattiche WHERE alunno = {$stid} AND tipo_preferenza = {$pref}");
+			}
+			else {
+				$db->executeUpdate("INSERT INTO rb_fc_preferenze_didattiche (alunno, tipo_preferenza, valore) VALUES ({$stid}, {$pref}, '{$value}')");
+			}
+		} catch (MySQLException $ex){
+			$response['status'] = "kosql";
+			$response['message'] = $ex->getMessage();
+			$response['query'] = $ex->getQuery();
+			echo json_encode($response);
+			exit;
+		}
+		echo json_encode($response);
+		exit;
+		break;
+	case 'get_teachers':
+		$stid = $_POST['stid'];
+		try{
+			$res = $db->executeQuery("SELECT uid, cognome, nome FROM rb_utenti, rb_fc_preferenze_didattiche WHERE uid = valore AND tipo_preferenza = 1 AND alunno = {$stid} ORDER BY cognome, nome");
+		} catch (MySQLException $ex){
+			$response['status'] = "kosql";
+			$response['message'] = $ex->getMessage();
+			$response['query'] = $ex->getQuery();
+			echo json_encode($response);
+			exit;
+		}
+		$ts = [];
+		$st = [];
+		if ($res->num_rows > 0) {
+			while ($row = $res->fetch_assoc()) {
+				$ts[$row['stid']] = $row['cognome']." ".$row['nome'];
+				$st[] = $row['cognome']." ".$row['nome'];
+			}
+		}
+		$response['data'] = $ts;
+		$response['string'] = implode(", ", $st);
+		echo json_encode($response);
+		exit;
+		break;
+	case 'add_teacher':
+		$stid = $_POST['stid'];
+		$tid = $_POST['tid'];
+		try{
+			$db->executeUpdate("INSERT INTO rb_fc_preferenze_didattiche (alunno, tipo_preferenza, valore) VALUES ({$stid}, 1, '{$tid}')");
+		} catch (MySQLException $ex){
+			$response['status'] = "kosql";
+			$response['message'] = $ex->getMessage();
+			$response['query'] = $ex->getQuery();
+			echo json_encode($response);
+			exit;
+		}
+		echo json_encode($response);
+		exit;
+		break;
+	case 'del_teacher':
+		$stid = $_POST['stid'];
+		$tid = $_POST['tid'];
+		try{
+			$db->executeUpdate("DELETE FROM rb_fc_preferenze_didattiche WHERE alunno = {$stid} AND tipo_preferenza = 1 AND valore = '{$tid}'");
+		} catch (MySQLException $ex){
+			$response['status'] = "kosql";
+			$response['message'] = $ex->getMessage();
+			$response['query'] = $ex->getQuery();
+			echo json_encode($response);
+			exit;
+		}
+		echo json_encode($response);
+		exit;
+		break;
+	case 'upd_other':
+		$stid = $_POST['stid'];
+		$pref = 3;
+		$value = $_POST['value'];
+		$id = $_POST['id_other'];
+		try{
+			if ($id != 0) {
+				$db->executeUpdate("UPDATE rb_fc_preferenze_didattiche SET valore = '{$value}' WHERE id_p = {$id}");
+			}
+			else {
+				$db->executeUpdate("INSERT INTO rb_fc_preferenze_didattiche (alunno, tipo_preferenza, valore) VALUES ({$stid}, {$pref}, '{$value}')");
+			}
+		} catch (MySQLException $ex){
+			$response['status'] = "kosql";
+			$response['message'] = $ex->getMessage();
+			$response['query'] = $ex->getQuery();
+			echo json_encode($response);
+			exit;
+		}
+		echo json_encode($response);
+		exit;
+		break;
+	case 'del_other':
+		$stid = $_POST['stid'];
+		$pref = 3;
+		$id = $_POST['id_other'];
+		try{
+			$db->executeUpdate("DELETE FROM rb_fc_preferenze_didattiche WHERE id_p = {$id}");
+		} catch (MySQLException $ex){
+			$response['status'] = "kosql";
+			$response['message'] = $ex->getMessage();
+			$response['query'] = $ex->getQuery();
+			echo json_encode($response);
+			exit;
+		}
+		echo json_encode($response);
+		exit;
+		break;
+	case 'get_other':
+		$stid = $_POST['stid'];
+		try{
+			$res = $db->executeQuery("SELECT valore FROM rb_fc_preferenze_didattiche WHERE tipo_preferenza = 3 AND alunno = {$stid}");
+		} catch (MySQLException $ex){
+			$response['status'] = "kosql";
+			$response['message'] = $ex->getMessage();
+			$response['query'] = $ex->getQuery();
+			echo json_encode($response);
+			exit;
+		}
+		$v = [];
+		if ($res->num_rows > 0) {
+			while ($row = $res->fetch_assoc()) {
+				$v[] = $row['valore'];
+			}
+		}
+		$response['string'] = implode(". ", $v);
+		echo json_encode($response);
+		exit;
+		break;
+	case 'upd_note':
+		$stid = $_POST['stid'];
+		$pref = 4;
+		$value = $_POST['value'];
+		$id = $_POST['id_other'];
+		try{
+			if ($id != 0) {
+				$db->executeUpdate("UPDATE rb_fc_preferenze_didattiche SET valore = '{$value}' WHERE id_p = {$id}");
+			}
+			else {
+				$db->executeUpdate("INSERT INTO rb_fc_preferenze_didattiche (alunno, tipo_preferenza, valore) VALUES ({$stid}, {$pref}, '{$value}')");
+			}
+		} catch (MySQLException $ex){
+			$response['status'] = "kosql";
+			$response['message'] = $ex->getMessage();
+			$response['query'] = $ex->getQuery();
+			echo json_encode($response);
+			exit;
+		}
+		echo json_encode($response);
+		exit;
+		break;
+	case 'del_note':
+		$stid = $_POST['stid'];
+		$pref = 4;
+		$id = $_POST['id_other'];
+		try{
+			$db->executeUpdate("DELETE FROM rb_fc_preferenze_didattiche WHERE id_p = {$id}");
+		} catch (MySQLException $ex){
+			$response['status'] = "kosql";
+			$response['message'] = $ex->getMessage();
+			$response['query'] = $ex->getQuery();
+			echo json_encode($response);
+			exit;
+		}
+		echo json_encode($response);
+		exit;
+		break;
+	case 'get_note':
+		$stid = $_POST['stid'];
+		try{
+			$res = $db->executeQuery("SELECT valore FROM rb_fc_preferenze_didattiche WHERE tipo_preferenza = 4 AND alunno = {$stid}");
+		} catch (MySQLException $ex){
+			$response['status'] = "kosql";
+			$response['message'] = $ex->getMessage();
+			$response['query'] = $ex->getQuery();
+			echo json_encode($response);
+			exit;
+		}
+		$v = [];
+		if ($res->num_rows > 0) {
+			while ($row = $res->fetch_assoc()) {
+				$v[] = $row['valore'];
+			}
+		}
+		$response['string'] = implode(". ", $v);
+		echo json_encode($response);
+		exit;
+		break;
+	case 'get_students':
+		$stid = $_POST['stid'];
+		try{
+			$res = $db->executeQuery("SELECT id_alunno, cognome, nome FROM rb_fc_alunni, rb_fc_preferenze_alunni WHERE id_alunno = preferenza AND alunno = {$stid} ORDER BY cognome, nome");
+		} catch (MySQLException $ex){
+			$response['status'] = "kosql";
+			$response['message'] = $ex->getMessage();
+			$response['query'] = $ex->getQuery();
+			echo json_encode($response);
+			exit;
+		}
+		$ts = [];
+		$st = [];
+		if ($res->num_rows > 0) {
+			while ($row = $res->fetch_assoc()) {
+				$ts[$row['stid']] = $row['cognome']." ".$row['nome'];
+				$st[] = $row['cognome']." ".$row['nome'];
+			}
+		}
+		$response['data'] = $ts;
+		$response['string'] = implode(", ", $st);
+		echo json_encode($response);
+		exit;
+		break;
 }
 try{
 	$db->executeUpdate($query);
